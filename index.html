@@ -127,13 +127,24 @@
       @@
 
     -->
-    <div class="container-fluid">
+    <div class="container-fluid" id="mainContainer">
+      <!--
+        Please read some basics about the Bootstrap Grid System: http://getbootstrap.com/css/#grid
+        The grid system is based on 12 cols per row and different layouts can be configured based on the screen sizes.
+      -->
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-
+        <div class="col-md-12" id="filters">
+          Some filters perhaps...
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-
+      </div>
+      <div class="row">
+        <div class="col-md-8 col-sm-12" id="chart1">
+          A chart could go here...
+        </div>
+        <div class="col-md-4 col-sm-12" id="keyFindings">
+          <div class="well">
+            Some key findings might go here...
+          </div>
         </div>
       </div>
     </div>

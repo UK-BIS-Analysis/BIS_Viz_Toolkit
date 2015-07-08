@@ -9,3 +9,7 @@
 
 */
 
+/* Offset the main container so that it's not hidden under the navbar */
+#mainContainer {
+  margin-top: 70px;
+}
