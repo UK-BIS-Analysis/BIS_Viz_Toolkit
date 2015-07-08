@@ -2,6 +2,11 @@
 # https://help.github.com/articles/ignoring-files
 # Example .gitignore files: https://github.com/github/gitignore
 
+
+# Note: bower and npm components are usually excluded from git to keep repositories lean.
+# However considered the limited amount of dependencies and to avoid requiring
+# users to use bower these are included in this repository.
+
 .~*
 .brackets.json
 node_modules
