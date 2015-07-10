@@ -3,6 +3,7 @@
 ## Intro
 
 * **Public git repository**: [https://github.com/UK-BIS-Analysis/BIS_Viz_Toolkit](https://github.com/UK-BIS-Analysis/BIS_Viz_Toolkit)
+* **Private git repository**: [https://bitbucket.org/fmerletti/dbis_bis_viz_toolkit](https://bitbucket.org/fmerletti/dbis_bis_viz_toolkit)
 * **Licence**: [MIT](http://opensource.org/licenses/MIT)
 
 ### Libraries, frameworks and tools used:
