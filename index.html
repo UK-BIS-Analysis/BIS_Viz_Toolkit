@@ -130,20 +130,23 @@
     <div class="container-fluid" id="mainContainer">
       <!--
         Please read some basics about the Bootstrap Grid System: http://getbootstrap.com/css/#grid
-        The grid system is based on 12 cols per row and different layouts can be configured based on the screen sizes.
+        The grid system is based on 12 cols per row and different layouts can be configured based on
+        screen sizes, resulting in a responsive layout.
       -->
       <div class="row">
         <div class="col-md-12" id="filters">
-          Some filters perhaps...
+          <!-- Some filters perhaps... -->
         </div>
       </div>
       <div class="row">
         <div class="col-md-8 col-sm-12" id="chart1">
-          A chart could go here...
+          <!-- A chart could go here... -->
         </div>
         <div class="col-md-4 col-sm-12" id="keyFindings">
           <div class="well">
-            Some key findings might go here...
+            <!-- Some key findings might go here... -->
+            <h3>Key Findings</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at lobortis quam. Curabitur bibendum aliquet est laoreet placerat. Praesent sollicitudin lacus in mi hendrerit tempor...</p>
           </div>
         </div>
       </div>
@@ -180,6 +183,7 @@
     <script type="text/javascript" src="libs/bootstrap/dist/js/bootstrap.js"></script>
     <script type="text/javascript" src="libs/d3/d3.js"></script>
     <script type="text/javascript" src="libs/c3/c3.js"></script>
+    <script type="text/javascript" src="libs/crossfilter/crossfilter.js"></script>
     <!-- endbuild -->
     <!-- This is the main visualization script loaded through RequireJS -->
     <script data-main="js/visualization" src="libs/requirejs/require.js"></script>
