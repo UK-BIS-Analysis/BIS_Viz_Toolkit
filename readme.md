@@ -14,8 +14,8 @@ Frontend:
 * [jQuery](https://jquery.com/): UI management
 * [RequireJS](http://requirejs.org/): Packaging and modularization of the app
 * [D3](http://d3js.org/): Graphing and map
-* [C3](http://c3js.org): Reusable charts
 * [Crossfilter](https://github.com/square/crossfilter): Used as an in-browser database
+* [DC.js](https://github.com/dc-js/dc.js): Reusable charts
 * [Modernizr](http://modernizr.com/): For checking feature support in browsers
 
 Development tools:
@@ -25,8 +25,9 @@ Development tools:
 
 Both are command line tools and depend on NodeJS and NPM being installed on a system. See [nodejs.org](https://nodejs.org/) for installation instructions.
 
-## Technical overview
+You can use a (portable Windows Node development environment)[https://github.com/mjs2020/PortableNodeDevEnv] to use these tools without admin rights.
 
+## Technical overview
 
 
 ### Build process: packaging and optimization
