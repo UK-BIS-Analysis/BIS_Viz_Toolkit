@@ -10,8 +10,9 @@
  *  (_| || |_| || | _  | |\__ \
  * \__, | \__,_||_|(_)_/ ||___/
  * |___/             |__/
- * THIS RUNS THE MAIN LOGIC OF THE Visualization
- * It wraps everything in the requirejs callback function and calls the necessary helpers as dependencies.
+ *
+ * This file stores any behaviours relative to the graphical user interface.
+ * Generally all that is needed is to call gui.setup() in the main visualization.js file.
  * */
 
 define([], function() {
@@ -32,6 +33,7 @@ define([], function() {
       $('body').on('hidden.bs.modal', '#modal', function () {
         $(this).removeData('bs.modal');
       });
+
       // Share links: build links with http://www.sharelinkgenerator.com if needed
       var winTop = (screen.height / 2) - (520 / 2),
           winLeft = (screen.width / 2) - (350 / 2);
