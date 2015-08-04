@@ -62,6 +62,7 @@
     <link href="libs/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet">
     <link href="libs/fontawesome/css/font-awesome.css" rel="stylesheet">
     <link href="libs/select2/dist/css/select2.css" rel="stylesheet">
+    <link href="libs/dcjs/dc.css" rel="stylesheet">
     <!-- endbuild -->
     <!-- build:css build/main.min.css -->
     <link href="css/general.css" rel="stylesheet">
@@ -144,11 +145,14 @@
           <!-- A chart could go here... -->
         </div>
         <div class="col-md-4 col-sm-12" id="keyFindings">
-          <div class="well">
-            <!-- Some key findings might go here... -->
-            <h3>Key Findings</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at lobortis quam. Curabitur bibendum aliquet est laoreet placerat. Praesent sollicitudin lacus in mi hendrerit tempor...</p>
-          </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 well" id="myKeyF">
+          <!-- Some key findings might go here... -->
+          <h3>Key Findings</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at lobortis quam. Curabitur bibendum aliquet est laoreet placerat. Praesent sollicitudin lacus in mi hendrerit tempor...</p>
         </div>
       </div>
     </div>
@@ -183,12 +187,12 @@
     <script type="text/javascript" src="libs/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="libs/bootstrap/dist/js/bootstrap.js"></script>
     <script type="text/javascript" src="libs/d3/d3.js"></script>
-    <script type="text/javascript" src="libs/c3/c3.js"></script>
     <script type="text/javascript" src="libs/crossfilter/crossfilter.js"></script>
+    <script type="text/javascript" src="libs/dcjs/dc.js"></script>
     <script type="text/javascript" src="libs/select2/dist/js/select2.full.js"></script>
     <!-- endbuild -->
     <!-- This is the main visualization script loaded through RequireJS -->
-    <script data-main="js/visualization" src="libs/requirejs/require.js"></script>
+    <script data-main="js/viz" src="libs/requirejs/require.js"></script>
 
 
     <!--
@@ -200,7 +204,6 @@
       @@  You need to sign up to Google Analytics at http://analytics.google.com
           Add your tracking code below in place of XXXXXXXXXXX below
     -->
-    <!-- Google Analytics tracking code -->
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
