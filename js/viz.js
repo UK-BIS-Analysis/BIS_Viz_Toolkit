@@ -2,6 +2,7 @@
 /*jslint white: true */
 /*jslint vars: true */
 /*global $, Modernizr, d3, dc, crossfilter, document, console, alert, require, window, DEBUG */
+
 // Add a timestamp to the query to avoid browser caching
 require.config({ urlArgs: "build=" + (new Date()).getTime() });
 
@@ -27,40 +28,15 @@ require.config({ urlArgs: "build=" + (new Date()).getTime() });
  * The entire file is wrapped in the require function (see http://requirejs.org/) which takes two arguments:
  *    - An array of paths to module files (without ".js" at the end)
  *    - A callback function which gets passed the objects returned by each of the modules, in the order they were specified.
+ *      Please note that modules have capitalized names. Instances below will have lower cases names.
+ * Then it is wrapped in the jQuery $(document).ready callback to make sure the DOM has completed loading.
  * */
-
-
-
-require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/charts/pulsesurvey'], function(gui, data, controls, pulsesurvey) {
-  'use strict';
-
-
-
-
-  /*
-   * Step 1: Define data, dimensions and possibly groups
-   * Start here. Set the URL, type and dimensions of your data.
-   * - Url can be relative to index.html (e.g. 'data/samples/questions.csv') or absolute (e.g. 'http://www.example.com/data.json')
-   * - Type can be csv, tsv or json
-   * - Dimensions are the columns in your data that you want to be able to filter by (more than 8 dimensions are not recommended)
-   * You can load multiple data sources by creating different variables.
-   * The actual loading will actually happen below in the final step.
-   * */
-  var vizData = data()
-    .url('data/samples/questions.csv')
-    .type('csv')
-    .dimensions(['Q', 'Period', 'Question']);
-
-  /*
-   * Step 2: Define charts
-   */
-  console.log(pulsesurvey());
-  var pulsesurveychart = pulsesurvey('#chart1', 'pulsesurvey')
-    //.group(vizData)
-    //.dimension(vizData);
-
-  // This jQuery callback makes sure that all code is run after the document and scripts have all loaded properly
+require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/charts/pulsesurvey'], function(gui, Data, Controls, pulsesurvey) {
   $(document).ready(function () {
+    'use strict';
+
+    // Setup GUI behaviours
+    gui.setup();
 
     // Use Modernizr to check for browser requirements and if they are not met display an error in a modal and don't load anything else.
     if (!Modernizr.svg) {
@@ -68,24 +44,102 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/charts/puls
       return;
     }
 
-    // Setup GUI behaviours
-    gui.setup();
+    /*
+     * ███████╗████████╗███████╗██████╗      ██╗
+     * ██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ███║
+     * ███████╗   ██║   █████╗  ██████╔╝    ╚██║
+     * ╚════██║   ██║   ██╔══╝  ██╔═══╝      ██║
+     * ███████║   ██║   ███████╗██║          ██║
+     * ╚══════╝   ╚═╝   ╚══════╝╚═╝          ╚═╝ : Define data and dimensions
+     *
+     * Start here. Set the URL, type and dimensions of your data.
+     * - Url can be relative to index.html (e.g. 'data/samples/questions.csv') or absolute (e.g. 'http://www.example.com/data.json')
+     * - Type can be csv, tsv or json
+     * - Dimensions are the columns in your data that you want to be able to filter by (more than 8 dimensions are not recommended)
+     * You can load multiple data sources by creating different variables (e.g. data1, data2...)
+     *
+     */
+    var data = Data()
+      .load('data/samples/questions.csv', 'csv')
+      .setDim('Q')
+      .setDim('Period');
 
-    // Final step: Load data and display controls and charts
-    vizData.load(function (err, vizData) {
-      if (err) {
-        console.log(err);
-        // do something to show the error or handle error
-      }
 
-      console.log(vizData.xfDims().Q.top(Infinity));
 
-      // Render controls
-      // controls.draw('#filters', vizData);
 
-      // Render charts
-      dc.renderAll();
+    /*
+     * ███████╗████████╗███████╗██████╗     ██████╗
+     * ██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ╚════██╗
+     * ███████╗   ██║   █████╗  ██████╔╝     █████╔╝
+     * ╚════██║   ██║   ██╔══╝  ██╔═══╝     ██╔═══╝
+     * ███████║   ██║   ███████╗██║         ███████╗
+     * ╚══════╝   ╚═╝   ╚══════╝╚═╝         ╚══════╝ : Define and draw any filters
+     *
+     * Filters are drop down menus that expose the dimensions to the user similarly to the auto-filters in Excel.
+     *
+     */
+    var controls = Controls()
+      .attach(data)
+      .draw('Q', 'Question', '#qFilter');
 
-    }); // Close vizData.load
+
+
+
+    /*
+     * ███████╗████████╗███████╗██████╗     ██████╗
+     * ██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ╚════██╗
+     * ███████╗   ██║   █████╗  ██████╔╝     █████╔╝
+     * ╚════██║   ██║   ██╔══╝  ██╔═══╝      ╚═══██╗
+     * ███████║   ██║   ███████╗██║         ██████╔╝
+     * ╚══════╝   ╚═╝   ╚══════╝╚═╝         ╚═════╝  : Define charts
+     *
+     * Setup any charts.
+     *
+     */
+
+
+
+
+
+    /*
+     * ███████╗████████╗███████╗██████╗     ██╗  ██╗
+     * ██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ██║  ██║
+     * ███████╗   ██║   █████╗  ██████╔╝    ███████║
+     * ╚════██║   ██║   ██╔══╝  ██╔═══╝     ╚════██║
+     * ███████║   ██║   ███████╗██║              ██║
+     * ╚══════╝   ╚═╝   ╚══════╝╚═╝              ╚═╝ : Attach events...?
+     */
+    // TODO This will probably go at the end post-defining charts & filters
+    data.on('dataLoaded', function (records) {
+
+    });
+
+
+
+
+    /*
+   * Step 2: Define charts
+   */
+    //  var pulsesurveychart = pulsesurvey('#chart1', 'pulsesurvey')
+    //    //.group(vizData)
+    //    //.dimension(vizData);
+    //
+    //  // This jQuery callback makes sure that all code is run after the document and scripts have all loaded properly
+    //    // Final step: Load data and display controls and charts
+    //    vizData.load(function (err, vizData) {
+    //      if (err) {
+    //        console.log(err);
+    //        // do something to show the error or handle error
+    //      }
+    //
+    //      console.log(vizData.xfDims().Q.top(Infinity));
+    //
+    //      // Render controls
+    //      // controls.draw('#filters', vizData);
+    //
+    //      // Render charts
+    //      dc.renderAll();
+    //
+    //    }); // Close vizData.load
   });   // Close $(document).ready
 });     // Close require

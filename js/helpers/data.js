@@ -1,6 +1,7 @@
 /*jslint browser: true*/
 /*jslint white: true */
 /*jslint vars: true */
+/*jslint nomen: true*/
 /*global $, Modernizr, d3, dc, crossfilter, document, console, alert, define, DEBUG, queryObject, btoa */
 
 
@@ -17,84 +18,150 @@
  *                           |__/
  *
  * This is a requirejs module and therefore the file is wrapped in a define() function.
- * The module returns a function with chainable methods which act as getters and setters.
+ * This is inspired by the dataManager module from the book "Developing a D3.js Edge" by Roland Dunn & Ger Hobbelt & Andrew Thornton & Chris Viau & Troy Mott, 2015 Bleeding Edge Press
  *
- * This can be used for example like this in viz.js:
- * var vizData = data()
- *    .url('data/samples/questions.csv')
- *    .type('csv')
- *    .dimensions(['Q', 'Period', 'Question']);
+ * Example usage:
+ *   var data = dataManager()
+ *     .load('data/samples/questions.csv', 'csv')
+ *     .on('dataLoaded', function (records) {
+ *       console.log(records);
+ *     });
  *
  * */
 
 define([], function() {
   'use strict';
 
-  return function () {
+  return function module () {
 
-    // Internal variables
-    var url, type, dimensions,
-        // The crossfilter object, in some tutorials it's called ndx
-        xf = {},
-        // An object in which we will store all the dimensions we will create
-        xfDims = {},
-        // TODO: An object in which we will store all the groups we will create
-        xfGroups = {},
-        // The data object is the object we will return for consmption. It has all the
-        // public methods and properties, including, getters and setters to access the
-        // above properties which are in the closure.
-        data = {};
+    // Chainable exportable function
+    var exports = function () { return this; },
+        // Internal variables
+        dispatch = d3.dispatch('dataLoaded', 'dataLoading', 'filtered'),
+        data,
+        // Crossfilter & dimensions
+        xf = crossfilter(),
+        dims = {};
 
-    // The load function takes a config object with url, type and dimensions,
-    // loads the data and then calls the callback function passing a new
-    // crossfilter object as a parameter.
-    data.load = function (callback) {
-      // Return an error if not enough parameters are given.
-      if (!url || !type) {
-        callback('Insufficient data passed in data config object.');
-        return;
-      }
-      // Load the data using the d3 fuction for the chosen data type.
-      d3[type](url, function (err, rows) {
-        // Place the resulting data into crossfilter
-        xf = crossfilter(rows);
-        // Add dimensions to crossfilter
-        dimensions.forEach(function (dim) {
-          xfDims[dim] = xf.dimension(function(d) { return d[dim]; });
-        });
-        // Callback
-        callback(null, data);
+
+
+
+    /*
+     * data.load
+     * A method that loads a data file, applies a cleaning function asynchronously.
+     */
+    exports.load = function(_file, _type, _cleaningFunc) {
+
+      // If _type is not csv, tsv or json then return an error
+      if (['csv', 'tsv', 'json'].indexOf(_type) === -1) { throw 'Unrecognized or unspecified data type.'; }
+
+      // Create the request using d3.
+      var loadCsv = d3[_type](_file);
+
+      // On the progress event, dispatch the custom dataLoading event.
+      loadCsv.on('progress', function() { dispatch.dataLoading(d3.event.loaded);});
+
+      // Launch a get request for the data file
+      loadCsv.get(function (_err, _response) {
+        if (_err) { throw _err };
+
+        // If a a cleaning function is supplied then apply it.
+        if (typeof _cleaningFunc === 'function') {
+          _response.forEach(function (d) { _cleaningFunc(d); });
+        }
+
+        //Assign the cleaned response to our data variable.
+        data = _response;
+
+        //Add data to our Crossfilter.
+        xf.add(_response);
+
+        //Dispatch our custom dataLoaded event passing in the cleaned data.
+        dispatch.dataLoaded(_response);
       });
+
+      // Return self so that the function is chainable
+      return this;
     };
 
-    // Getters and setters
-    data.url = function(value) {
-      if (!arguments.length) { return url; }
-      url = value;
-      return data;
-    };
-    data.type = function(value) {
-      if (!arguments.length) { return type; }
-      type = value;
-      return data;
-    };
-    data.dimensions = function(value) {
-      if (!arguments.length) { return dimensions; }
-      dimensions = value;
-      return data;
-    };
-    // Getters only
-    data.exposedFilters = function() {
-      return exposedFilters;
-    };
-    data.xf = function() {
-      return xf;
-    };
-    data.xfDims = function() {
-      return xfDims;
+
+
+
+    /*
+     * data.addDim
+     * A method that creates a new dimension on the crossfilter.
+     */
+    exports.setDim = function (_dim) {
+
+      // Create the dimension if it does not exist yet
+      if (!dims[_dim]) {
+        dims[_dim] = xf.dimension(function (d) {
+          return d[_dim];
+        });
+      }
+
+      // Return self so that the function is chainable
+      return this;
     };
 
-    return data;
+
+
+
+    /*
+     * data.getDim
+     * Create a method to get a crossfilter dimension
+     */
+    exports.getDim = function (_dim) {
+      return dims[_dim];
+    }
+
+
+
+
+    /*
+     * data.filter
+     * Create a method to apply a filter all crossfilter values are supported:
+     *  data.filter([100, 200]); // selects values between 100 and 200
+     *  data.filter(120); // selects values equal to 120
+     *  data.filter(function(d) { return d % 2; }); // selects values which are odd
+     *  data.filter(null); // selects all values
+     */
+    exports.filter = function (_dim, filter) {
+      dims[_dim].filter(filter);
+      console.log('New filtered data: %o', dims[_dim].top(Infinity));
+      dispatch.filtered();
+    }
+
+
+
+
+    /*
+     * data.getData
+     * Create a method to access the cleaned data.
+     */
+    exports.getData = function () {
+      return data;
+    };
+
+
+
+
+    /*
+     * data.getCrossfilterSize
+     * Create a method to get the size of our crossfilter
+     */
+    exports.getCrossfilterSize = function () {
+      return xf.size();
+    };
+
+
+
+
+    // Bind the 'on' event of the dispatch object to the exportable data module itself.
+    d3.rebind(exports, dispatch, 'on');
+
+    // Return object
+    return exports;
 
   };
 });

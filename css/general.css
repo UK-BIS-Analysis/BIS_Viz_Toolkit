@@ -18,3 +18,10 @@
 [class*="col-"] {
   min-height: 15em;
 }
+
+
+
+/* Give some space for the clear value x */
+a.select2-choice {
+  padding-right: 3em !important;
+}
