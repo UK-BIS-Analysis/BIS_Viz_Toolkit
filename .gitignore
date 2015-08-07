@@ -9,6 +9,5 @@
 
 .~*
 .brackets.json
-node_modules
 /.tmp/
 /notes.md

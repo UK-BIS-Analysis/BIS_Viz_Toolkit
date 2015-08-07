@@ -1,5 +1,7 @@
 # BIS Analysis Data Visualization Template
 
+This is actively under construction and by no means ready for use!
+
 ## Intro
 
 * **Public git repository**: [https://github.com/UK-BIS-Analysis/BIS_Viz_Toolkit](https://github.com/UK-BIS-Analysis/BIS_Viz_Toolkit)
@@ -15,7 +17,6 @@ Frontend:
 * [RequireJS](http://requirejs.org/): Packaging and modularization of the app
 * [D3](http://d3js.org/): Graphing and map
 * [Crossfilter](https://github.com/square/crossfilter): Used as an in-browser database
-* [DC.js](https://github.com/dc-js/dc.js): Reusable charts
 * [Modernizr](http://modernizr.com/): For checking feature support in browsers
 
 Development tools:
@@ -33,12 +34,7 @@ You can use a [portable Windows Node development environment](https://github.com
 ### Build process: packaging and optimization
 
 The source code of the application is optimized and minified for production use unsing [Grunt](http://gruntjs.com/) based on the ```Gruntfile.js```
-script. To run the optimization and generate production code make sure you have all dependencies installed by running (you only need to do
-this once on your system):
-
-    npm install
-    
-You can then generate production code simply by running:
+script. You can then generate production code simply by running:
 
     grunt
 
