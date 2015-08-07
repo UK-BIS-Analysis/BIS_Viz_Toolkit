@@ -25,7 +25,7 @@ Development tools:
 
 Both are command line tools and depend on NodeJS and NPM being installed on a system. See [nodejs.org](https://nodejs.org/) for installation instructions.
 
-You can use a (portable Windows Node development environment)[https://github.com/mjs2020/PortableNodeDevEnv] to use these tools without admin rights.
+You can use a [portable Windows Node development environment](https://github.com/mjs2020/PortableNodeDevEnv) to use these tools without admin rights.
 
 ## Technical overview
 
@@ -51,6 +51,14 @@ The distributable build is generated in the ```build``` directory.
 * Remember to modify the index.dev.html file instead of the index.html file in development.
 * Variables are preferably named using camelCase
 * Indenting is 2 spaces (no tabs)
+
+### Inspirational reading
+
+The toolkit was made possible by reading a large number of books, articles, Github issues and StackOverflow questions and answers. Here are some.
+
+* Viau, C., Thornton, A., Hobbelt, G., Dunn, R. (2014). [Developing a D3.js Edge](http://bleedingedgepress.com/our-books/developing-a-d3-js-edge/). Bleeding Edge Press.
+* Le Bek, P. (2014). Building Responsive Visualizations with D3.js. Available: https://www.safaribooksonline.com/blog/2014/02/17/building-responsible-visualizations-d3-js/. Last accessed 8th Aug 2015.
+* Shull, E. (2014). Saving Browser-based SVGs as Images. Available: http://spin.atomicobject.com/2014/01/21/convert-svg-to-png/. Last accessed 8th Aug 2015.
 
 ### Credits
 
