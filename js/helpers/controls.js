@@ -8,10 +8,7 @@
 
 
 
-/*
- *
- *
- *                  _              _          _
+/*                 _              _          _
  *   __  ___  _ _ | |_  _ _  ___ | | ___    (_) ___
  *  / _|/ _ \| ' \|  _|| '_|/ _ \| |(_-< _  | |(_-<
  *  \__|\___/|_||_|\__||_|  \___/|_|/__/(_)_/ |/__/
@@ -73,7 +70,7 @@ define([], function() {
           });
 
       // In order to add multiple event listeners we namespace them with the name of the dimension
-      //data.on('filtered.'+_dim, function () {$select.select2("updateResults")});
+      //data.on('dataUpdate.'+_dim, function () {$select.select2("updateResults")});
 
       // When value is changed
       $select.on('change', function (evt) {

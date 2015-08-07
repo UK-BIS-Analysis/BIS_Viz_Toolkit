@@ -23,7 +23,7 @@
  * Example usage:
  *   var data = dataManager()
  *     .load('data/samples/questions.csv', 'csv')
- *     .on('dataLoaded', function (records) {
+ *     .on('dataUpdate', function (records) {
  *       console.log(records);
  *     });
  *
@@ -37,7 +37,7 @@ define([], function() {
     // Chainable exportable function
     var exports = function () { return this; },
         // Internal variables
-        dispatch = d3.dispatch('dataLoaded', 'dataLoading', 'filtered'),
+        dispatch = d3.dispatch('dataUpdate', 'dataLoading'),
         data,
         // Crossfilter & dimensions
         xf = crossfilter(),
@@ -63,7 +63,7 @@ define([], function() {
 
       // Launch a get request for the data file
       loadCsv.get(function (_err, _response) {
-        if (_err) { throw _err };
+        if (_err) { throw _err; };
 
         // If a a cleaning function is supplied then apply it.
         if (typeof _cleaningFunc === 'function') {
@@ -76,8 +76,8 @@ define([], function() {
         //Add data to our Crossfilter.
         xf.add(_response);
 
-        //Dispatch our custom dataLoaded event passing in the cleaned data.
-        dispatch.dataLoaded(_response);
+        //Dispatch our custom dataUpdate event passing in the cleaned data.
+        dispatch.dataUpdate(_response);
       });
 
       // Return self so that the function is chainable
@@ -129,7 +129,7 @@ define([], function() {
     exports.filter = function (_dim, filter) {
       dims[_dim].filter(filter);
       console.log('New filtered data: %o', dims[_dim].top(Infinity));
-      dispatch.filtered();
+      dispatch.dataUpdate(dims[_dim].top(Infinity));
     }
 
 
