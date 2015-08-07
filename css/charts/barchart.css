@@ -1,0 +1,16 @@
+/*
+ * This file is called via JS and inlined in the SVG.
+ * It is not included via a <script> tag in the HTML.
+ * This allows it to be included in the download SVG feature.
+ */
+
+text {
+  font-size: 10px;
+}
+
+line, path.domain {
+  stroke: #f00;
+  fill: none;
+  stroke-opacity: .75;
+  shape-rendering: crispEdges;
+}
