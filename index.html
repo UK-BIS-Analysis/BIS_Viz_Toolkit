@@ -146,7 +146,7 @@
           <div id="qFilter"></div>
         </div>
       </div>
-      <div class="row">
+      <div class="row top-buffer">
         <div class="col-md-6 col-sm-12">
           <div class="panel panel-default">
             <div class="panel-heading">
@@ -154,10 +154,13 @@
               <div class="dropdown chart-options">
                 <button class="btn btn-default dropdown-toggle btn-xs" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                   <span class="glyphicon glyphicon-cog"></span>
+                  <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right chart-option-menu" aria-labelledby="dropdownMenu1">
-                  <li><a href="#" class="downloadSvg">Download chart as SVG</a></li>
-                  <li><a href="#" class="downloadCsv">Download data in CSV</a></li>
+                  <li><a href="#" id="chart1-downloadSvg">Download chart as SVG</a></li>
+                  <li><a href="#" id="chart1-downloadPng">Download chart as PNG</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" id="chart1-downloadCsv">Download data in CSV</a></li>
                 </ul>
               </div>
               <h3 class="panel-title">Simple bar chart</h3>

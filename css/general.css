@@ -28,3 +28,7 @@ a.select2-choice {
 .chart-options {
   float: right;
 }
+
+.top-buffer {
+  margin-top: 1em;
+}
