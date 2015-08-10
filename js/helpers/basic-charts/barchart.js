@@ -2,7 +2,7 @@
 /*jslint white: true */
 /*jslint vars: true */
 /*jslint nomen: true*/
-/*global $, Modernizr, d3, dc, crossfilter, document, console, alert, define, DEBUG, queryObject, btoa */
+/*global $, Modernizr, d3, dc, crossfilter, document, console, alert, define, DEBUG, queryObject, btoa, screen */
 
 
 
@@ -20,48 +20,64 @@
  * Example usage:
  *   var chart1 = Barchart()
  *     .title('An example chart')
- *     .downloadCsv(true)
- *     .downloadSvg(true)
+ *     .csvOption(true)
+ *     .svgOption(true)
  *     .yAccessor(function (d) { return d.A1 });
- * */
+ */
 
-define([], function() {
+define(['helpers/basic-charts/_base'], function(Base) {
   'use strict';
 
-  // This is the function that is called when you do something like:
-  //   var chart1 = Barchart()
+  // This is the function that is called when you do something like: var chart1 = Barchart()
   return function module () {
-    // Various internal, private variables of the module. These are within the function 'Closure'
-    var margin = {top: 20, right: 20, bottom: 40, left: 40},
-        // Defaults
-        width = 500,
-        height = 500,
+
+    // Instantiate base chart
+    var _base = new Base();
+
+    // Configuration variables
+    var cssPath = 'css/charts/barchart.css';
+
+    // Internal, private, variables of the module. These are within the function 'Closure'
+    var margin = { top: 20, right: 20, bottom: 40, left: 40 },
+        width = 400,      // Width and height determine the chart aspect ratio
+        height = 300,
         gap = 0,
-        ease = 'linear', // Options: https://devdocs.io/d3/transitions#d3_ease
-        svg, title, downloadCsv, downloadSvg,
-        yAccessor = function (d) { return d },
-        // Configuration
-        cssPath = 'css/charts/barchart.css',
-        namespace = 'barchart-'+(Math.random() * (9999 - 0) + 0),
-        // Dispatcher for the 'customHover' event
-        dispatch = d3.dispatch('customHover');
+        ease = 'linear',  // Options: https://devdocs.io/d3/transitions#d3_ease
+        svg,
+        dispatch = d3.dispatch('customHover'); // Dispatcher for the custom events
+
+
+    // Variables that can be set with getters/setters below
+    var yAccessor = function (d) { return d; };
+
+
 
     // The exportable function
     var exports = function (_selection) {
       _selection.each(function(_data) {
-        console.log(_data);
+
+        // Use the accessor function to get a simple array of values needed.
         _data = _data.map(yAccessor);
-        console.log(_data);
+
         // If this is the first time that the function is called and no svg element exists, then
         // create it along with the main 'g' elements.
         if (!svg) {
-          svg = d3.select(this)
-            .append("svg")
-            .classed("chart", true);
-          var container = svg.append("g").classed("container-group", true);
+
+          svg = d3.select(this).append("svg").classed("chart", true);
+          var container = svg.append("g").classed("container-group", true).classed("barchart", true);
           container.append("g").classed("chart-group", true);
           container.append("g").classed("x-axis-group axis", true);
           container.append("g").classed("y-axis-group axis", true);
+
+          //////////////////////////////////////////////////////////
+          // Add a listener to the window resize event and call itself to redraw chart
+          _base
+            .addResizeListener(exports, _selection)
+            //.injectCss()
+            .render(this);
+
+
+
 
           // Get CSS via AJAX and inject it inline so that it can be exported
           d3.text(cssPath+'?t=' + (new Date()).getTime(), function (err, text) {
@@ -69,46 +85,6 @@ define([], function() {
               .attr({type: 'text/css', media: 'screen'})
               .text(text);
           });
-
-          // Add a listener to the window resize event and call itself
-          d3.select(window).on('resize.'+namespace, function () {
-            exports(_selection);
-          });
-
-          // Add title
-          if (title) {
-            $(this).prepend('<h2 class="chart-title">'+title+'</h2>');
-          }
-          // Add dropdown menu
-          if ((downloadCsv || downloadSvg) && Modernizr.blobconstructor) {
-            var $dropdown = $(this)
-              .prepend('<div class="dropdown chart-options">'+
-                '<button class="btn btn-default dropdown-toggle btn-xs" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
-                  '<span class="caret"></span>'+
-                '</button>'+
-                '<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1"></ul>'+
-              '</div>').children('.chart-options');
-            if (downloadSvg) { $dropdown.children('.dropdown-menu').append('<li><a href="#" class="download">Download chart as SVG</a></li>') };
-            if (downloadCsv) {
-              $dropdown.children('.dropdown-menu')
-                .append('<li><a href="#" class="downloadCsv">Download data in CSV</a></li>')
-                .find('a.downloadCsv')
-                .click(function (e) {
-                  e.preventDefault();
-                  var csvData = "";
-                console.log(_data);
-                // TODO make data into CSV
-                _data.forEach(function (v) {
-                  if (typeof v === 'object') {
-
-                  } else {
-                    return v;
-                  }
-                });
-              })
-            };
-            $dropdown.children('.dropdown-toggle').dropdown();
-          }
         }
 
         /*
@@ -121,9 +97,10 @@ define([], function() {
          */
 
         // Update width and height to match parent (this together with the chart redrawing on window resize makes it responsive)
-        var _parentElement = d3.select(this).node();
+        var _parentElement = d3.select(this).node(),
+            ratio = height/width;
+        height = d3.min([$(window).height() - $('#navbar').height()*1.7, _parentElement.getBoundingClientRect().width * ratio]);
         width = _parentElement.getBoundingClientRect().width;
-        height = d3.max([height, _parentElement.getBoundingClientRect().height]);
 
         // Internal sizing of the chart and bars
         var chartW = width - margin.left - margin.right,
@@ -162,13 +139,13 @@ define([], function() {
 
         // Couple of variables used to layout the individual bars.
         var gapSize = x1.rangeBand() / 100 * gap;
-        var barW = x1.rangeBand() - gapSize;
+        barW = x1.rangeBand() - gapSize;
 
         // Setup the enter, exit and update of the actual bars in the chart.
         // Select the bars, and bind the data to the .bar elements.
         var bars = svg.select(".chart-group")
-        .selectAll(".bar")
-        .data(_data);
+          .selectAll(".bar")
+          .data(_data);
         // If there aren't any bars create them
         bars.enter().append("rect")
           .classed("bar", true)
@@ -190,29 +167,14 @@ define([], function() {
         // If exiting, i.e. deleting, fade using a transition and remove.
         bars.exit().transition().style({opacity: 0}).remove();
       });
-    }
-
-
-
-
-    // Getters and setters
-    exports.title = function(_x) {
-      if (!arguments.length) return title;
-      title = _x;
-      return this;
     };
-    exports.downloadCsv = function(_x) {
-      if (!arguments.length) return downloadCsv;
-      downloadCsv = _x;
-      return this;
-    };
-    exports.downloadSvg = function(_x) {
-      if (!arguments.length) return downloadSvg;
-      downloadSvg = _x;
-      return this;
-    };
+
+
+
+
+    // Custom getters and setters
     exports.yAccessor = function(func) {
-      if (!arguments.length) return yAccessor;
+      if (!arguments.length) { return yAccessor; }
       yAccessor = func;
       return this;
     };
@@ -220,7 +182,10 @@ define([], function() {
     // Rebind 'customHover' event to the "exports" function, so it's available "externally" under the typical "on" method:
     d3.rebind(exports, dispatch, "on");
 
-    // Return object
+    // Rebind methods from the _base chart to the current module
+    d3.rebind(exports, _base, 'title', 'csvOption', 'svgOption');
+
+    // Return exports function
     return exports;
   };
 
