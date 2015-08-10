@@ -31,7 +31,7 @@ require.config({ urlArgs: "build=" + (new Date()).getTime() });
  *      Please note that modules have capitalized names. Instances below will have lower cases names.
  * Then it is wrapped in the jQuery $(document).ready callback to make sure the DOM has completed loading.
  * */
-require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/example-charts/barchart'], function(gui, Data, Controls, Barchart) {
+require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-charts/barchart'], function(gui, Data, Controls, Barchart) {
   $(document).ready(function () {
     'use strict';
 
@@ -61,7 +61,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/example-cha
      */
     var data = Data()
       .load('data/samples/questions.csv', 'csv')
-      .setDim('Q')
+      .setDim('Question')
       .setDim('Period');
 
 
@@ -80,7 +80,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/example-cha
      */
     var controls = Controls()
       .attach(data)
-      .draw('Q', 'Question', '#qFilter');
+      .draw('Question', 'Question', '#qFilter');
 
 
 
@@ -98,9 +98,6 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/example-cha
      */
     // Initialize and configure the chart1 drawing function
     var chart1 = Barchart()
-      .title('An example chart')
-      .downloadCsv(true)
-      .downloadSvg(true)
       .yAccessor(function (d) { return d.A1 });
 
     data.on('dataUpdate.chart1', function (records) {
