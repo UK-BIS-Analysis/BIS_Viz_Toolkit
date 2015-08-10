@@ -14,19 +14,16 @@
   margin-top: 70px;
 }
 
-/* Set a minimum height for cols */
-[class*="col-"] {
-  min-height: 15em;
+a.navbar-brand {
+  padding-top: 5px;
+  padding-left: 0;
+  margin-left: -2px !important;
 }
-
-
 
 /* Give some space for the clear value x */
 a.select2-choice {
   padding-right: 3em !important;
 }
-
-
 
 .chart-options {
   float: right;
