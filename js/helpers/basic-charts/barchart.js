@@ -29,12 +29,7 @@ define(['helpers/basic-charts/_base'], function(Base) {
   return function module () {
 
     // Configuration variables
-    var margin = { top: 20, right: 20, bottom: 40, left: 40 },
-        width = 400,      // Width and height determine the chart aspect ratio
-        height = 300,
-        gap = 0,
-        ease = 'linear',  // Options: https://devdocs.io/d3/transitions#d3_ease
-        svg,
+    var svg,
         dispatch = d3.dispatch('customHover'); // Dispatcher for the custom events
 
     // Variables that can be set with getters/setters below
@@ -61,18 +56,27 @@ define(['helpers/basic-charts/_base'], function(Base) {
          *  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝ ╚═════╝
          */
 
-        // If this is the first time that the function is called and no svg element exists, then create it along with the main 'g' elements.
+        // If this is the first run and we don't have the reference to the SVG
+        // node saved then get it. Note that the svg element is actually created
+        // by the Base class and here we are only saving a D3 object with it.
         if (!svg) {
-          svg = _base.getSvg();
+          svg = d3.select(this).select('svg');
           var container = svg.append("g").classed("container-group", true).classed("barchart", true);
           container.append("g").classed("chart-group", true);
           container.append("g").classed("x-axis-group axis", true);
           container.append("g").classed("y-axis-group axis", true);
         }
 
+        // Main visualization variables
+        var margin = { top: 20, right: 20, bottom: 40, left: 40 },
+            width = 400,      // Width and height determine the chart aspect ratio
+            height = 300,
+            ratio = height/width,
+            gap = 0,
+            ease = 'linear';  // Options: https://devdocs.io/d3/transitions#d3_ease
+
         // Update width and height to match parent (this together with the chart redrawing on window resize makes it responsive)
-        var _parentElement = d3.select(this).node(),
-            ratio = height/width;
+        var _parentElement = d3.select(this).node();
         height = d3.min([$(window).height() - $('#navbar').height()*1.7, _parentElement.getBoundingClientRect().width * ratio]);
         width = _parentElement.getBoundingClientRect().width;
 

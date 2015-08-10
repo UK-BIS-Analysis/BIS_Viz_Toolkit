@@ -23,21 +23,21 @@ define([], function() {
 
   return function module (_selector) {
     // Internal vars
-    var svg = d3.select(_selector)
-                .append("svg")
-                .attr('xmlns', 'http://www.w3.org/2000/svg')
-                .attr("version", "1.1"),
-        namespace = 'chart-'+Math.floor(Math.random() * 9999);
+    var svg = d3.select(_selector).select('svg');
+    if (svg.size() === 0) {
+      svg = d3.select(_selector)
+              .append("svg")
+              .attr('xmlns', 'http://www.w3.org/2000/svg')
+              .attr("version", "1.1");
+    }
+
+
 
     // Constructor function (adds the svg)
     var exports = function () { return this };
 
-    exports.getSvg = function () {
-      return svg;
-    }
-
     exports.addResizeListener = function (func, sel) {
-      d3.select(window).on('resize.'+namespace, function () {
+      $(window).on('resize', function () {
         func(sel);
       });
       return this;
