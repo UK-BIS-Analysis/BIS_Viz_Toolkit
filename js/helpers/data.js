@@ -128,7 +128,7 @@ define([], function() {
      */
     exports.filter = function (_dim, filter) {
       dims[_dim].filter(filter);
-      console.log('New filtered data: %o', dims[_dim].top(Infinity));
+      console.table(dims[_dim].top(Infinity));
       dispatch.dataUpdate(dims[_dim].top(Infinity));
     }
 
