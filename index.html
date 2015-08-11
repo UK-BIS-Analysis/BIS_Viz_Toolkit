@@ -126,14 +126,12 @@
         /  |/  /___ _ (_)___    ____ ___   ___  / /_ ___ _ (_)___  ___  ____
        / /|_/ // _ `// // _ \  / __// _ \ / _ \/ __// _ `// // _ \/ -_)/ __/
       /_/  /_/ \_,_//_//_//_/  \__/ \___//_//_/\__/ \_,_//_//_//_/\__//_/
-      @@
+      @@ Please read some basics about the Bootstrap Grid System: http://getbootstrap.com/css/#grid
+         The grid system is based on 12 cols per row and different layouts can be configured based on
+         screen sizes, resulting in a responsive layout.
     -->
     <div class="container-fluid" id="mainContainer">
-      <!--
-        Please read some basics about the Bootstrap Grid System: http://getbootstrap.com/css/#grid
-        The grid system is based on 12 cols per row and different layouts can be configured based on
-        screen sizes, resulting in a responsive layout.
-      -->
+      <!-- Title and filters row -->
       <div class="row">
         <div class="col-md-12">
           <h1 class="page-header">Data Visualization Template</h1>
@@ -146,8 +144,10 @@
           <div id="qFilter"></div>
         </div>
       </div>
+      <!-- First line of the visualization -->
       <div class="row top-buffer">
         <div class="col-md-6 col-sm-12">
+          <!-- Panel with first chart: Barchart -->
           <div class="panel panel-default">
             <div class="panel-heading">
               <!-- Dropdown menu with download options (remove what you don't want) -->
@@ -166,32 +166,31 @@
               <h3 class="panel-title">Simple bar chart</h3>
             </div>
             <div class="panel-body">
-              <div id="chart1"></div>
+              <div id="chart1-barchart"></div>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-sm-12">
+          <!-- Panel with second chart: Stacked bar chart -->
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Key findings (text)</h3>
+              <!-- Dropdown menu with download options (remove what you don't want) -->
+              <div class="dropdown chart-options">
+                <button class="btn btn-default dropdown-toggle btn-xs" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span class="glyphicon glyphicon-cog"></span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right chart-option-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="#" id="chart2-downloadSvg">Download chart as SVG</a></li>
+                  <li><a href="#" id="chart2-downloadPng">Download chart as PNG</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" id="chart2-downloadCsv">Download data in CSV</a></li>
+                </ul>
+              </div>
+              <h3 class="panel-title">Simple stacked row chart</h3>
             </div>
             <div class="panel-body">
-              <h1>1.0 First level heading</h1>
-              <h2>1.1 Second level heading</h2>
-              <h3>1.1.1 Third level heading</h3>
-              <p class="lead">Lead text, Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              <p>You can use lists and text elements like:</p>
-              <ol>
-                <li><strong>Bold text</strong></li>
-                <li><em>Italic text</em></li>
-                <li><u>Undelined text</u></li>
-                <li><s>Strikeout text</s></li>
-                <li><mark>Highglighted text</mark></li>
-                <li><small>Small text</small></li>
-                <li>Abbreviations: <abbr title="Department for Business Innovation and Skills">BIS</abbr></li>
-                <li>Inline code: <code>d3.max([3,6,8,10])</code></li>
-                <li>Keyboard commmands: To copy press <kbd><kbd>ctrl</kbd> + <kbd>c</kbd></kbd></li>
-              </ol>
+              <div id="chart2-stackedRowchart"></div>
             </div>
           </div>
         </div>
@@ -210,9 +209,25 @@
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">More text styles</h3>
+              <h3 class="panel-title">Text styles</h3>
             </div>
             <div class="panel-body">
+              <h1>1.0 First level heading</h1>
+              <h2>1.1 Second level heading</h2>
+              <h3>1.1.1 Third level heading</h3>
+              <p class="lead">Lead text, Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              <p>You can use lists and text elements like:</p>
+              <ol>
+                <li><strong>Bold text</strong></li>
+                <li><em>Italic text</em></li>
+                <li><u>Undelined text</u></li>
+                <li><s>Strikeout text</s></li>
+                <li><mark>Highglighted text</mark></li>
+                <li><small>Small text</small></li>
+                <li>Abbreviations: <abbr title="Department for Business Innovation and Skills">BIS</abbr></li>
+                <li>Inline code: <code>d3.max([3,6,8,10])</code></li>
+                <li>Keyboard commmands: To copy press <kbd><kbd>ctrl</kbd> + <kbd>c</kbd></kbd></li>
+              </ol>
               <blockquote>
                 <p>Blockquotes can be used to highlight quotes.</p>
                 <footer>An old wise man <cite title="Source Title">The book of typography</cite></footer>

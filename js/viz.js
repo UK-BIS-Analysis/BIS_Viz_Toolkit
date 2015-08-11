@@ -1,6 +1,7 @@
 /*jslint browser: true*/
 /*jslint white: true */
 /*jslint vars: true */
+/*jslint nonew: true */
 /*global $, Modernizr, d3, dc, crossfilter, document, console, alert, require, window, DEBUG */
 
 // Add a timestamp to the query to avoid browser caching
@@ -31,9 +32,9 @@ require.config({ urlArgs: "build=" + (new Date()).getTime() });
  *      Please note that modules have capitalized names. Instances below will have lower cases names.
  * Then it is wrapped in the jQuery $(document).ready callback to make sure the DOM has completed loading.
  * */
-require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-charts/barchart'], function(gui, Data, Controls, Barchart) {
+require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-charts/barchart', 'helpers/basic-charts/stackedRowchart'], function(gui, Data, Controls, Barchart, StackedRowchart) {
+  'use strict';
   $(document).ready(function () {
-    'use strict';
 
     // Setup GUI behaviours
     gui.setup();
@@ -61,8 +62,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
      */
     var data = Data()
       .load('data/samples/questions.csv', 'csv')
-      .setDim('Question')
-      .setDim('Period');
+      .setDim('Question');
 
 
 
@@ -96,58 +96,25 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
      * Setup any charts.
      *
      */
-    // Initialize and configure the chart1 drawing function
-    var chart1 = Barchart()
-      .yAccessor(function (d) { return d.A1 });
 
+    // Initialize and configure the barchart drawing function
+    var barchart = Barchart()
+      .accessor(function (d) { return d.A1; });
     data.on('dataUpdate.chart1', function (records) {
-      d3.select('#chart1')
+      d3.select('#chart1-barchart')
         .datum(records)
-        .call(chart1);
+        .call(barchart);
+    });
+
+    // Initialize and configure the stacked rowchart drawing function
+    var stackedRowchart = StackedRowchart()
+      .accessor(function (d) { return [d.A1, d.A2, d.A3, d.A4, d.A5]; });
+    data.on('dataUpdate.chart2', function (records) {
+      d3.select('#chart2-stackedRowchart')
+        .datum(records)
+        .call(stackedRowchart);
     });
 
 
-
-
-
-
-
-    /*
-     * ███████╗████████╗███████╗██████╗     ██╗  ██╗
-     * ██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ██║  ██║
-     * ███████╗   ██║   █████╗  ██████╔╝    ███████║
-     * ╚════██║   ██║   ██╔══╝  ██╔═══╝     ╚════██║
-     * ███████║   ██║   ███████╗██║              ██║
-     * ╚══════╝   ╚═╝   ╚══════╝╚═╝              ╚═╝ : Attach events...?
-     */
-    // TODO This will probably go at the end post-defining charts & filters
-//    data.on('dataUpdate', function (records) {
-//
-//    });
-
-
-
-    // GARBAGE....
-    //  var pulsesurveychart = pulsesurvey('#chart1', 'pulsesurvey')
-    //    //.group(vizData)
-    //    //.dimension(vizData);
-    //
-    //  // This jQuery callback makes sure that all code is run after the document and scripts have all loaded properly
-    //    // Final step: Load data and display controls and charts
-    //    vizData.load(function (err, vizData) {
-    //      if (err) {
-    //        console.log(err);
-    //        // do something to show the error or handle error
-    //      }
-    //
-    //      console.log(vizData.xfDims().Q.top(Infinity));
-    //
-    //      // Render controls
-    //      // controls.draw('#filters', vizData);
-    //
-    //      // Render charts
-    //      dc.renderAll();
-    //
-    //    }); // Close vizData.load
   });   // Close $(document).ready
 });     // Close require

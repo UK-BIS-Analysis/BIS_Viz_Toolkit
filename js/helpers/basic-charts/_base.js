@@ -26,14 +26,12 @@ define([], function() {
     var svg = d3.select(_selector).select('svg');
     if (svg.size() === 0) {
       svg = d3.select(_selector)
-              .append("svg")
+              .append('svg')
               .attr('xmlns', 'http://www.w3.org/2000/svg')
-              .attr("version", "1.1");
+              .attr('version', '1.1');
     }
 
-
-
-    // Constructor function (adds the svg)
+    // Exportable function
     var exports = function () { return this };
 
     exports.addResizeListener = function (func, sel) {
@@ -71,8 +69,8 @@ define([], function() {
             }
             csvStr += line + '\r\n';
         }
-        var blob = new Blob([csvStr], {type: "text/plain;charset=utf-8"});
-        saveAs(blob, "data.csv");
+        var blob = new Blob([csvStr], {type: 'text/plain;charset=utf-8'});
+        saveAs(blob, 'data.csv');
       })
       return this;
     };
@@ -81,8 +79,8 @@ define([], function() {
       d3.select(_link).on('click', function (evt) {
         var outer = document.createElement('div');
         outer.appendChild(d3.select(_selector).select('svg').node().cloneNode(true));
-        var blob = new Blob([outer.innerHTML], {type: "text/plain;charset=utf-8"});
-        saveAs(blob, "chart.svg");
+        var blob = new Blob([outer.innerHTML], {type: 'text/plain;charset=utf-8'});
+        saveAs(blob, 'chart.svg');
       });
       return this;
     };
@@ -104,7 +102,7 @@ define([], function() {
           context.drawImage(image, 0, 0);
 
           var a = document.createElement('a');
-          a.download = "image.png";
+          a.download = 'image.png';
           a.href = canvas.toDataURL('image/png');
           document.body.appendChild(a);
           a.click();
@@ -112,6 +110,13 @@ define([], function() {
       });
       return this;
     };
+
+    // TODO:
+    // exports.addXaxisTitle
+    // exports.addYaxisTitle
+    // exports.xTickFormat
+    // exports.yTickFormat
+    // legends?
 
 
     return exports;

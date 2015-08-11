@@ -19,7 +19,9 @@
  *
  * Example usage:
  *   var chart1 = Barchart()
- *     .yAccessor(function (d) { return d.A1 });
+ *     .accessor(function (d) { return d.A1 });
+ *
+ * The accessor is supposed to return a single value which will be used for the bar height.
  */
 
 define(['helpers/basic-charts/_base'], function(Base) {
@@ -33,7 +35,7 @@ define(['helpers/basic-charts/_base'], function(Base) {
         dispatch = d3.dispatch('customHover'); // Dispatcher for the custom events
 
     // Variables that can be set with getters/setters below
-    var yAccessor = function (d) { return d; };
+    var accessor = function (d) { return d; };
 
     // The exportable function
     var exports = function (_selection) {
@@ -61,10 +63,10 @@ define(['helpers/basic-charts/_base'], function(Base) {
         // by the Base class and here we are only saving a D3 object with it.
         if (!svg) {
           svg = d3.select(this).select('svg');
-          var container = svg.append("g").classed("container-group", true).classed("barchart", true);
-          container.append("g").classed("chart-group", true);
-          container.append("g").classed("x-axis-group axis", true);
-          container.append("g").classed("y-axis-group axis", true);
+          var container = svg.append('g').classed('container-group', true).classed('barchart', true);
+          container.append('g').classed('chart-group', true);
+          container.append('g').classed('x-axis-group axis', true);
+          container.append('g').classed('y-axis-group axis', true);
         }
 
         // Main visualization variables
@@ -83,66 +85,64 @@ define(['helpers/basic-charts/_base'], function(Base) {
         // Internal sizing of the chart and bars
         var chartW = width - margin.left - margin.right,
             chartH = height - margin.top - margin.bottom,
-            barW = chartW / _data.map(yAccessor).length;
+            barW = chartW / _data.length;
 
-        // x and y scales and axis
-        var x1 = d3.scale.ordinal()
+        // X and Y scales and axis
+        var xScale = d3.scale.ordinal()
           .domain(_data.map(function(d, i) { return i; }))
           .rangeRoundBands([0, chartW], 0.1);
-        var y1 = d3.scale.linear()
-          .domain([0, d3.max(_data, function(d, i) { return yAccessor(d); })])
+        var yScale = d3.scale.linear()
+          .domain([0, d3.max(_data, function(d, i) { return accessor(d); })])
           .range([chartH, 0]);
         var xAxis = d3.svg.axis()
-          .scale(x1)
-          .orient("bottom");
+          .scale(xScale)
+          .orient('bottom');
         var yAxis = d3.svg.axis()
-          .scale(y1)
-          .orient("left");
+          .scale(yScale)
+          .orient('left');
 
         // Transform the main 'svg' and axes into place.
         svg.transition().attr({width: width, height: height});
-        svg.select(".container-group")
-          .attr({transform: "translate(" + margin.left + "," + margin.top + ")"});
-
-        svg.select(".x-axis-group.axis")
+        svg.select('.container-group')
+          .attr({transform: 'translate(' + margin.left + ',' + margin.top + ')'});
+        svg.select('.x-axis-group.axis')
           .transition()
           .ease(ease)
-          .attr({transform: "translate(0," + (chartH) + ")"})
+          .attr({transform: 'translate(0,' + (chartH) + ')'})
           .call(xAxis);
-
-        svg.select(".y-axis-group.axis")
+        svg.select('.y-axis-group.axis')
           .transition()
           .ease(ease)
           .call(yAxis);
 
-        // Couple of variables used to layout the individual bars.
-        var gapSize = x1.rangeBand() / 100 * gap;
-        barW = x1.rangeBand() - gapSize;
+        // Determine bar and gap size.
+        var gapSize = xScale.rangeBand() / 100 * gap;
+        barW = xScale.rangeBand() - gapSize;
 
         // Setup the enter, exit and update of the actual bars in the chart.
-        // Select the bars, and bind the data to the .bar elements.
-        var bars = svg.select(".chart-group")
-          .selectAll(".bar")
+        // BIND: Select the bars, and bind the data to the .bar elements.
+        var bars = svg.select('.chart-group')
+          .selectAll('.bar')
           .data(_data);
-        // If there aren't any bars create them
-        bars.enter().append("rect")
-          .classed("bar", true)
+        // ENTER: Create elements that are not already in the DOM
+        bars.enter().append('rect')
+          .classed('bar', true)
           .attr({x: chartW,
                  width: barW,
-                 y: function(d, i) { return y1(yAccessor(d)); },
-                 height: function(d, i) { return chartH - y1(yAccessor(d)); }
+                 y: function(d, i) { return yScale(accessor(d)); },
+                 height: function(d, i) { return chartH - yScale(accessor(d)); }
                 })
-          .on("mouseover", dispatch.customHover);
-        // If updates required, update using a transition.
+          .on('mouseover', dispatch.customHover);
+        // UPDATE: Update any elements that are in the DOM but have new data binded to them
         bars.transition()
           .ease(ease)
           .attr({
           width: barW,
-          x: function(d, i) { return x1(i) + gapSize / 2; },
-          y: function(d, i) { return y1(yAccessor(d)); },
-          height: function(d, i) { return chartH - y1(yAccessor(d)); }
+          x: function(d, i) { return xScale(i) + gapSize / 2; },
+          y: function(d, i) { return yScale(accessor(d)); },
+          height: function(d, i) { return chartH - yScale(accessor(d)); }
         });
-        // If exiting, i.e. deleting, fade using a transition and remove.
+        // EXIT: Remove any elements that no longer match data
         bars.exit().transition().style({opacity: 0}).remove();
       });
     };
@@ -151,14 +151,14 @@ define(['helpers/basic-charts/_base'], function(Base) {
 
 
     // Custom getters and setters
-    exports.yAccessor = function(func) {
-      if (!arguments.length) { return yAccessor; }
-      yAccessor = func;
+    exports.accessor = function(func) {
+      if (!arguments.length) { return accessor; }
+      accessor = func;
       return this;
     };
 
-    // Rebind 'customHover' event to the "exports" function, so it's available "externally" under the typical "on" method:
-    d3.rebind(exports, dispatch, "on");
+    // Rebind 'customHover' event to the 'exports' function, so it's available 'externally' under the typical 'on' method:
+    d3.rebind(exports, dispatch, 'on');
 
     // Return exports function
     return exports;
