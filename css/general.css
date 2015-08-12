@@ -9,26 +9,25 @@
 
 */
 
-/* Offset the main container so that it's not hidden under the navbar */
-#mainContainer {
-  margin-top: 70px;
-}
-
-a.navbar-brand {
+/* Small bootstrap adjustments */
+.navbar-brand {
   padding-top: 5px;
   padding-left: 0;
   margin-left: -2px !important;
 }
-
-/* Give some space for the clear value x */
-a.select2-choice {
-  padding-right: 3em !important;
+.page-header {
+  margin: 20px 0 20px
 }
-
+#mainContainer {
+  margin-top: 70px;
+}
+/* Add some padding to the select2 controls */
+.select2-choice {
+  padding-right: 2em !important;
+}
 .chart-options {
   float: right;
 }
-
 .top-buffer {
   margin-top: 1em;
 }
