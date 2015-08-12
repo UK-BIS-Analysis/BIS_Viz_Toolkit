@@ -42,15 +42,12 @@ define([], function() {
     };
 
     exports.addCSS = function (_url) {
+      if (svg.select('defs').size() > 0) { return this; }
+      var defs = svg.append('defs');
       d3.text(_url, function (err, text) {
         var s = document.createElement('style');
         s.setAttribute('type', 'text/css');
         s.innerHTML = '/* <![CDATA[ */' + text + '/* ]]> */';
-
-        var defs = svg.select('defs');
-        if (defs.size() === 0) {
-          defs = svg.append('defs')
-        }
         defs.node().appendChild(s);
       });
       return this;
