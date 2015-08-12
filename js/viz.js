@@ -32,7 +32,7 @@ require.config({ urlArgs: "build=" + (new Date()).getTime() });
  *      Please note that modules have capitalized names. Instances below will have lower cases names.
  * Then it is wrapped in the jQuery $(document).ready callback to make sure the DOM has completed loading.
  * */
-require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-charts/barchart', 'helpers/basic-charts/stackedRowchart'], function(gui, Data, Filter, Barchart, StackedRowchart) {
+require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/barchart', 'helpers/basic-charts/stackedRowchart'], function(gui, Data, Filter, Barchart, StackedRowchart) {
   'use strict';
   $(document).ready(function () {
 
@@ -54,22 +54,32 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
      * ╚══════╝   ╚═╝   ╚══════╝╚═╝          ╚═╝ : Define data and dimensions
      *
      * Start here. Set the URL and dimensions of your data.
-     * - Url can be relative to index.html (e.g. 'data/samples/questions.csv') or absolute (e.g. 'http://www.example.com/data.json')
+     * - Url can be relative to index.html (e.g. 'data/samples/questions.csv')
+     *   or absolute (e.g. 'http://www.example.com/data.json')
      * - Type can be csv, tsv or json
-     * - Dimensions are the columns in your data that you want to be able to filter by (more than 8 dimensions are not recommended)
+     * - Dimensions are the columns in your data that you want to be able to filter by.
+     *   More than 8 dimensions are not recommended.
+     *   It's best to use column names that do not use spaces or special charachters.
      * You can load multiple data sources by creating different variables (e.g. data1, data2...)
      *
      * Example:
      *  var data = Data()
+     *    // Usage: .load(filepath, filetype, dataCleaningFunc)
      *    .load('data/samples/questions.csv', 'csv')
+     *    // Usage .setDim(dimensionName)
      *    .setDim('Question');
      *
      */
-    var data = Data()
+    var data = new Data()
       .load('data/samples/questions.csv', 'csv')
       .setDim('Question')
+      .setDim('Period')
       .filter('Question', 'Q01 Question one?');
 
+    var secondaryData = new Data()
+      .load('data/samples/gdp.csv', 'csv')
+      .setDim('quarterName')
+      .filter('quarterName', '1997 Q2');;
 
 
 
@@ -93,6 +103,13 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
       .attach(data)
       .add('Question', 'Question', '#qFilter');
 
+    var periodControl = Filter()
+      .attach(data)
+      .add('Period', 'Period', '#periodFilter');
+
+    var gdpControl = Filter()
+      .attach(secondaryData)
+      .add('quarterName', 'Quarter', '#gdpFilter');
 
 
 
@@ -117,7 +134,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
 
     // Bind the drawing of the functions to any update in the data
     data.on('dataUpdate', function (records) {
-      console.log('data update called');
+
       d3.select('#chart1-barchart')
         .datum(records).call(barchart);
 
