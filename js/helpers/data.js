@@ -38,10 +38,10 @@ define([], function() {
     var exports = function () { return this; },
         // Internal variables
         dispatch = d3.dispatch('dataUpdate', 'dataLoading'),
-        data,
         // Crossfilter & dimensions
         xf = crossfilter(),
-        dims = {};
+        dims = {},
+        currentFilters = {};
 
 
 
@@ -70,14 +70,18 @@ define([], function() {
           _response.forEach(function (d) { _cleaningFunc(d); });
         }
 
-        //Assign the cleaned response to our data variable.
-        data = _response;
-
-        //Add data to our Crossfilter.
+        // Add data to our Crossfilter.
         xf.add(_response);
 
-        //Dispatch our custom dataUpdate event passing in the cleaned data.
-        dispatch.dataUpdate(_response);
+        // If there already are any filters set then apply them to crossfilter
+        if (Object.keys(currentFilters).length) {
+          for (var key in currentFilters) {
+            exports.filter(key, currentFilters[key]);
+          }
+        } else {
+          //Dispatch our custom dataUpdate event passing in the cleaned data.
+          dispatch.dataUpdate(_response);
+        }
       });
 
       // Return self so that the function is chainable
@@ -112,6 +116,7 @@ define([], function() {
      * Create a method to get a crossfilter dimension
      */
     exports.getDim = function (_dim) {
+      // Note: this function returns the dimension and is not chainable
       return dims[_dim];
     }
 
@@ -120,6 +125,7 @@ define([], function() {
 
     /*
      * data.filter
+     * Create a getter/setter function.
      * Create a method to apply a filter all crossfilter values are supported:
      *  data.filter([100, 200]); // selects values between 100 and 200
      *  data.filter(120); // selects values equal to 120
@@ -127,32 +133,16 @@ define([], function() {
      *  data.filter(null); // selects all values
      */
     exports.filter = function (_dim, filter) {
+      // If no filter is passed then the function is being used as a getter so we return the current filter as stored
+      if (!filter) { return currentFilters[_dim]; }
+
+      // Otherwise apply the filter to the dimension
       dims[_dim].filter(filter);
-      console.table(dims[_dim].top(Infinity));
+      currentFilters[_dim] = filter;
+      //console.table(dims[_dim].top(Infinity));
       dispatch.dataUpdate(dims[_dim].top(Infinity));
+      return this;
     }
-
-
-
-
-    /*
-     * data.getData
-     * Create a method to access the cleaned data.
-     */
-    exports.getData = function () {
-      return data;
-    };
-
-
-
-
-    /*
-     * data.getCrossfilterSize
-     * Create a method to get the size of our crossfilter
-     */
-    exports.getCrossfilterSize = function () {
-      return xf.size();
-    };
 
 
 

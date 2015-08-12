@@ -32,7 +32,7 @@ require.config({ urlArgs: "build=" + (new Date()).getTime() });
  *      Please note that modules have capitalized names. Instances below will have lower cases names.
  * Then it is wrapped in the jQuery $(document).ready callback to make sure the DOM has completed loading.
  * */
-require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-charts/barchart', 'helpers/basic-charts/stackedRowchart'], function(gui, Data, Controls, Barchart, StackedRowchart) {
+require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-charts/barchart', 'helpers/basic-charts/stackedRowchart'], function(gui, Data, Filter, Barchart, StackedRowchart) {
   'use strict';
   $(document).ready(function () {
 
@@ -53,16 +53,22 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
      * ███████║   ██║   ███████╗██║          ██║
      * ╚══════╝   ╚═╝   ╚══════╝╚═╝          ╚═╝ : Define data and dimensions
      *
-     * Start here. Set the URL, type and dimensions of your data.
+     * Start here. Set the URL and dimensions of your data.
      * - Url can be relative to index.html (e.g. 'data/samples/questions.csv') or absolute (e.g. 'http://www.example.com/data.json')
      * - Type can be csv, tsv or json
      * - Dimensions are the columns in your data that you want to be able to filter by (more than 8 dimensions are not recommended)
      * You can load multiple data sources by creating different variables (e.g. data1, data2...)
      *
+     * Example:
+     *  var data = Data()
+     *    .load('data/samples/questions.csv', 'csv')
+     *    .setDim('Question');
+     *
      */
     var data = Data()
       .load('data/samples/questions.csv', 'csv')
-      .setDim('Question');
+      .setDim('Question')
+      .filter('Question', 'Q01 Question one?');
 
 
 
@@ -77,10 +83,15 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
      *
      * Filters are drop down menus that expose the dimensions to the user similarly to the auto-filters in Excel.
      *
+     * Example:
+     * var controls = Controls()
+     *   .attach(data)
+     *   .draw('Question', 'Question', '#qFilter')
+     *
      */
-    var controls = Controls()
+    var questionControl = Filter()
       .attach(data)
-      .draw('Question', 'Question', '#qFilter');
+      .add('Question', 'Question', '#qFilter');
 
 
 
@@ -97,24 +108,23 @@ require(['helpers/gui', 'helpers/data', 'helpers/controls', 'helpers/basic-chart
      *
      */
 
-    // Initialize and configure the barchart drawing function
+    // Initialize and configure the charts
     var barchart = Barchart()
       .accessor(function (d) { return d.A1; });
-    data.on('dataUpdate.chart1', function (records) {
-      d3.select('#chart1-barchart')
-        .datum(records)
-        .call(barchart);
-    });
 
-    // Initialize and configure the stacked rowchart drawing function
     var stackedRowchart = StackedRowchart()
-      .accessor(function (d) { return [d.A1, d.A2, d.A3, d.A4, d.A5]; });
-    data.on('dataUpdate.chart2', function (records) {
-      d3.select('#chart2-stackedRowchart')
-        .datum(records)
-        .call(stackedRowchart);
-    });
+      .accessor(function (d) { return [parseFloat(d.A1), parseFloat(d.A2), parseFloat(d.A3), parseFloat(d.A4), parseFloat(d.A5)]; });
 
+    // Bind the drawing of the functions to any update in the data
+    data.on('dataUpdate', function (records) {
+      console.log('data update called');
+      d3.select('#chart1-barchart')
+        .datum(records).call(barchart);
+
+      d3.select('#chart2-stackedRowchart')
+        .datum(records).call(stackedRowchart);
+
+    });
 
   });   // Close $(document).ready
 });     // Close require

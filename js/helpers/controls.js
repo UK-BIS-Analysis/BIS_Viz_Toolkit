@@ -42,6 +42,21 @@ define([], function() {
       return this;
     }
 
+    /*
+     * controls.add
+     * A method that adds
+     */
+    exports.add = function (_dim, _label, _selector) {
+      exports.draw(_dim, _label, _selector);
+      data.on('dataUpdate.filter'+_dim, function (records) {
+        if (data.filter(_dim)) {
+          $(_selector).val(data.filter(_dim)).trigger('change', [true]);
+        }
+        // TODO make sure size of widget is suitable
+        //
+      });
+      return this;
+    }
 
     /*
      * controls.draw
@@ -51,32 +66,46 @@ define([], function() {
       // Create a select control in the specified selector
       var $select = $(_selector)
         .select2({
-            allowClear: true,
-            placeholder: _label,
-            minimumResultsForSearch: 20,
-            theme: 'classic',
-            data: function () {
-              var options = data.getDim(_dim).group().top(Infinity).map(function(v) {
+          // placeholder: _label,
+          minimumResultsForSearch: 20,
+          //theme: 'classic',
+          data: function () {
+            // The data function is run each time the dropdown is opened
+            var options = data.getDim(_dim).group().top(Infinity)
+              .map(function(v) {
                 return {
                   id: v.key,
                   text: v.key + ' ('+v.value+')',
                   disabled: v.value === 0
                 }
-              }).sort(function (a,b) {
-                return a.id > b.id;
+              })
+              .sort(function (a,b) {
+                if(a.id < b.id) return -1;
+                if(a.id > b.id) return 1;
+                return 0;
               });
-              return { results: options }
-            }
-          });
+            return { results: options }
+          },
+//          initSelection: function(element, callback) {
+//            if (data.filter(_dim)) {
+//              // TODO set it according to filter
+//              return;
+//            }
+//
+//            //callback({id: options[0].id, text: options[0].text});
+//          },
+        });
 
       // In order to add multiple event listeners we namespace them with the name of the dimension
       //data.on('dataUpdate.'+_dim, function () {$select.select2("updateResults")});
 
       // When value is changed
-      $select.on('change', function (evt) {
-        var newValue = ($select[0].value != '') ? $select[0].value : null;
-        console.log('Filter set from dropdown: '+_dim+' = '+newValue);
-        data.filter(_dim, newValue);
+      $select.on('change', function (evt, internal) {
+        if (!internal) {
+           var newValue = ($select[0].value != '') ? $select[0].value : null;
+          //console.log('Filter set from dropdown: '+_dim+' = '+newValue);
+           data.filter(_dim, newValue);
+        }
       });
 
       return this;
