@@ -28,9 +28,11 @@ define([], function() {
 
   return function module () {
     // Chainable exportable function
-    var exports = function () { return this; },
-        // Internal variables
+    var exports = {},
+        // Internal variables and functions
+        internal = {},
         dispatch = d3.dispatch('filtered'),
+        options = [],
         data;
 
     /*
@@ -40,82 +42,74 @@ define([], function() {
     exports.attach = function (_data) {
       data = _data;
       return this;
-    }
+    };
 
     /*
      * controls.add
      * A method that adds
      */
     exports.add = function (_dim, _label, _selector) {
-      exports.draw(_dim, _label, _selector);
+      internal.draw(_dim, _selector);
       data.on('dataUpdate.filter'+_dim, function (records) {
+        // Update options array
+        options = internal.getOptions(_dim);
+        // If a filter is set on _dim then update the dropdown and trigger an internal change
         if (data.filter(_dim)) {
           $(_selector).val(data.filter(_dim)).trigger('change', [true]);
         }
-        // TODO make sure size of widget is suitable
-        //
       });
       return this;
-    }
+    };
 
     /*
-     * controls.draw
+     * internal.draw
      * A method that draws the select2 widget on screen
      */
-    exports.draw = function (_dim, _label, _selector) {
+    internal.draw = function (_dim, _selector) {
       // Create a select control in the specified selector
       var $select = $(_selector)
         .select2({
-          // placeholder: _label,
           minimumResultsForSearch: 20,
-          //theme: 'classic',
-          data: function () {
-            // The data function is run each time the dropdown is opened
-            var options = data.getDim(_dim).group().top(Infinity)
-              .map(function(v) {
-                return {
-                  id: v.key,
-                  text: v.key + ' ('+v.value+')',
-                  disabled: v.value === 0
-                }
-              })
-              .sort(function (a,b) {
-                if(a.id < b.id) return -1;
-                if(a.id > b.id) return 1;
-                return 0;
-              });
-            return { results: options }
-          },
-//          initSelection: function(element, callback) {
-//            if (data.filter(_dim)) {
-//              // TODO set it according to filter
-//              return;
-//            }
-//
-//            //callback({id: options[0].id, text: options[0].text});
-//          },
+          data: function () { return options; },
+          dropdownAutoWidth : true
+          // placeholder: _label,
+          // theme: 'classic',
         });
 
-      // In order to add multiple event listeners we namespace them with the name of the dimension
-      //data.on('dataUpdate.'+_dim, function () {$select.select2("updateResults")});
-
-      // When value is changed
+      // When value is changed update data object with filter
       $select.on('change', function (evt, internal) {
         if (!internal) {
-           var newValue = ($select[0].value != '') ? $select[0].value : null;
-          //console.log('Filter set from dropdown: '+_dim+' = '+newValue);
-           data.filter(_dim, newValue);
+          var newValue = ($select[0].value !== '') ? $select[0].value : null;
+          data.filter(_dim, newValue);
         }
       });
+    };
 
-      return this;
-    }
-
+    internal.getOptions = function (_dim) {
+      // The data function is run each time the dropdown is opened
+      var options = data
+        .getDim(_dim)
+        .group()
+        .top(Infinity)
+        .map(function(v) {
+          return {
+            id: v.key,
+            text: v.key + ' ('+v.value+')',
+            disabled: v.value === 0
+          };
+        })
+        .sort(function (a,b) {
+          if(a.id < b.id) { return -1; }
+          if(a.id > b.id) { return 1; }
+          return 0;
+        });
+      return { results: options };
+    };
 
     // Bind the 'on' event of the dispatch object to the exportable data module itself.
     d3.rebind(exports, dispatch, 'on');
 
     // Return object
     return exports;
-  }
+  };
 });
