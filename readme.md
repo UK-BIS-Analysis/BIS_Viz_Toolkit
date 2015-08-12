@@ -8,6 +8,18 @@ This is actively under construction and by no means ready for use!
 * **Private git repository**: [https://bitbucket.org/fmerletti/dbis_bis_viz_toolkit](https://bitbucket.org/fmerletti/dbis_bis_viz_toolkit)
 * **Licence**: [MIT](http://opensource.org/licenses/MIT)
 
+## Features
+
+* Plain D3 charts (examples that you can copy, paste and modify)
+* Data stored in Crossfilter
+* Exposing filters to users
+* Tables with jQuery Datatables
+* SVG, PNG and CSV downloads
+* Bootstrap modals with external files
+* Feature detection with Modernizr
+* Building responsive layouts with bootstrap
+* App packaging with Grunt
+
 ### Libraries, frameworks and tools used:
 
 Frontend:
@@ -58,10 +70,4 @@ The toolkit was made possible by reading a large number of books, articles, Gith
 
 ### Credits
 
-Coding by [Francesco Merletti](http://fm.to.it).
-
-Contacts:
-
-* Email: [me@fm.to.it](mailto:me@fm.to.it)
-* Twitter: [@mjs2020](http://fm.to.it/tw)
-* Github: [@mjs2020](http://fm.to.it/gh)
+Coding by [Francesco Merletti](http://fm.to.it) (Twitter: [@mjs2020](http://fm.to.it/tw),  Github: [@mjs2020](http://fm.to.it/gh))
