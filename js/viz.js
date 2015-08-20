@@ -133,16 +133,27 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
     var stackedRowchart = StackedRowchart()
       .accessor(function (d) { return [parseFloat(d.A1), parseFloat(d.A2), parseFloat(d.A3), parseFloat(d.A4), parseFloat(d.A5)]; });
 
-    // Bind the drawing of the functions to any update in the data
-    data.on('dataUpdate', function (records) {
 
+    /*
+     * ███████╗████████╗███████╗██████╗     ██╗  ██╗
+     * ██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ██║  ██║
+     * ███████╗   ██║   █████╗  ██████╔╝    ███████║
+     * ╚════██║   ██║   ██╔══╝  ██╔═══╝     ╚════██║
+     * ███████║   ██║   ███████╗██║              ██║
+     * ╚══════╝   ╚═╝   ╚══════╝╚═╝              ╚═╝ : Bind drawing functions to updates in the data
+     *
+     */
+    data.on('dataUpdate', function (records) {
       d3.select('#chart1-barchart')
         .datum(records).call(barchart);
-
       d3.select('#chart2-stackedRowchart')
         .datum(records).call(stackedRowchart);
-
     });
+
+    secondaryData.on('dataUpdate', function (records) {
+      // Do something with the secondary data
+    });
+
 
   });   // Close $(document).ready
 });     // Close require
