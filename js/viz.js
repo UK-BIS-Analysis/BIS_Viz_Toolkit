@@ -131,7 +131,15 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
       .accessor(function (d) { return d.A1; });
 
     var stackedRowchart = StackedRowchart()
-      .accessor(function (d) { return [parseFloat(d.A1), parseFloat(d.A2), parseFloat(d.A3), parseFloat(d.A4), parseFloat(d.A5)]; });
+      .accessor(function (d) {
+        return [
+          { label: 'Answer1', value: parseFloat(d.A1) },
+          { label: 'Answer2', value: parseFloat(d.A2) },
+          { label: 'Answer3', value: parseFloat(d.A3) },
+          { label: 'Answer4', value: parseFloat(d.A4) },
+          { label: 'Answer5', value: parseFloat(d.A5) }
+        ];
+      });
 
 
     /*
