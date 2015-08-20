@@ -31,19 +31,23 @@
 
 define([], function() {
   'use strict';
-
   return function module () {
 
-    // Chainable exportable function
-    var exports = function () { return this; },
+    // Internal (private) variables
+    var internal = function () {return this; },
+        // history object
+        history = window.History,
         // Internal variables
         dispatch = d3.dispatch('dataUpdate', 'dataLoading'),
         // Crossfilter & dimensions
         xf = crossfilter(),
         dims = {},
         currentFilters = {};
+    // Chainable exportable function
+    var exports = {};
 
-
+    // Any instantiation logic can go here
+    // console.log('Instantiated');
 
 
     /*
@@ -133,18 +137,58 @@ define([], function() {
      *  data.filter(null); // selects all values
      */
     exports.filter = function (_dim, filter) {
-      // If no filter is passed then the function is being used as a getter so we return the current filter as stored
+      // If no filter is passed then the function is being used as a getter
+      // so we return the current filter as stored
       if (!filter) { return currentFilters[_dim]; }
 
-      // Otherwise apply the filter to the dimension
-      dims[_dim].filter(filter);
-      currentFilters[_dim] = filter;
-      //console.table(dims[_dim].top(Infinity));
-      dispatch.dataUpdate(dims[_dim].top(Infinity));
+      // If the dimension exists then apply the filter to the dimension
+      if (dims[_dim]) {
+        dims[_dim].filter(filter);
+        currentFilters[_dim] = filter;
+
+        // Dispatch the update
+        //console.table(dims[_dim].top(Infinity));
+        dispatch.dataUpdate(dims[_dim].top(Infinity));
+
+        // And update URL
+        internal.updateURL();
+      }
       return this;
     }
 
 
+    internal.decodeURL = function () {
+      try {
+        var filters = {},
+            state = history.getState();
+        state.hash.split('?',2)[1].split('&').forEach(function (param) {
+            param = param.replace(/%20|\+/g, ' ').split('=');
+            filters[decodeURIComponent(param[0])] = (param[1] ? decodeURIComponent(param[1]) : undefined);
+        });
+        return filters;
+      } catch (err) {
+        return {};
+      }
+    },
+
+
+
+
+    internal.updateURL = function () {
+      // Consider params in other data objects
+      $.extend(currentFilters, internal.decodeURL());
+      console.log(currentFilters);
+      var query = '?';
+      for (var key in currentFilters) {
+        query += encodeURIComponent(key);
+        if (currentFilters[key]) {
+          query += '=' + encodeURIComponent(currentFilters[key]);
+        }
+        query += '&';
+      }
+      query = query.slice(0, -1);
+      history.replaceState(null,'',query)
+    },
 
 
     // Bind the 'on' event of the dispatch object to the exportable data module itself.
@@ -152,6 +196,5 @@ define([], function() {
 
     // Return object
     return exports;
-
-  };
+  }
 });

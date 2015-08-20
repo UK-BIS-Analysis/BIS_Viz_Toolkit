@@ -59,6 +59,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      * - Type can be csv, tsv or json
      * - Dimensions are the columns in your data that you want to be able to filter by.
      *   More than 8 dimensions are not recommended.
+     *   Ensure that dimension names are unique even if you use different data sources.
      *   It's best to use column names that do not use spaces or special charachters.
      * You can load multiple data sources by creating different variables (e.g. data1, data2...)
      *
