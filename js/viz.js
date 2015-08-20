@@ -75,12 +75,12 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
       .load('data/samples/questions.csv', 'csv')
       .setDim('Question')
       .setDim('Period')
-      .filter('Question', 'Q01 Question one?');
+      .filter('Question', 'Q01 Question one?', true);
 
     var secondaryData = new Data()
       .load('data/samples/gdp.csv', 'csv')
       .setDim('quarterName')
-      .filter('quarterName', '1997 Q2');;
+      .filter('quarterName', '1997 Q2', true);
 
 
 

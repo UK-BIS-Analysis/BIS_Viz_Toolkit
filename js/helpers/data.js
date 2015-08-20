@@ -108,6 +108,12 @@ define([], function() {
         });
       }
 
+      // If a filter is set by URL then apply it
+      var urlFilters = internal.decodeURL();
+      if (urlFilters[_dim]) {
+        exports.filter(_dim, urlFilters[_dim]);
+      }
+
       // Return self so that the function is chainable
       return this;
     };
@@ -136,13 +142,14 @@ define([], function() {
      *  data.filter(function(d) { return d % 2; }); // selects values which are odd
      *  data.filter(null); // selects all values
      */
-    exports.filter = function (_dim, filter) {
+    exports.filter = function (_dim, filter, isDefault) {
       // If no filter is passed then the function is being used as a getter
       // so we return the current filter as stored
       if (!filter) { return currentFilters[_dim]; }
 
-      // If the dimension exists then apply the filter to the dimension
-      if (dims[_dim]) {
+      // If the dimension exists in this data object instance and either this is not a default or is not already set
+      // then apply the filter to the dimension.
+      if (dims[_dim] && (!isDefault || !currentFilters[_dim])) {
         dims[_dim].filter(filter);
         currentFilters[_dim] = filter;
 
@@ -175,19 +182,19 @@ define([], function() {
 
 
     internal.updateURL = function () {
-      // Consider params in other data objects
-      $.extend(currentFilters, internal.decodeURL());
-      console.log(currentFilters);
-      var query = '?';
-      for (var key in currentFilters) {
+      var urlFilters = internal.decodeURL(),
+          query = '?';
+      $.extend(urlFilters, currentFilters);
+      delete urlFilters._suid;
+      for (var key in urlFilters) {
         query += encodeURIComponent(key);
-        if (currentFilters[key]) {
-          query += '=' + encodeURIComponent(currentFilters[key]);
+        if (urlFilters[key]) {
+          query += '=' + encodeURIComponent(urlFilters[key]);
         }
         query += '&';
       }
       query = query.slice(0, -1);
-      history.replaceState(null,'',query)
+      history.replaceState(null,$('title').text(),query);
     },
 
 
