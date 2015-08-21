@@ -26,9 +26,10 @@
     "dcjs": "~2.0.0-beta.12",
     "select2": "~3.5.2",
     "FileSaver": "*",
-    "history.js": "~1.8.0"
+    "history.js": "~1.8.0",
+    "d3-tip": "~0.6.7"
   },
   "resolutions": {
-    "d3": "~3.5.6"
+    "d3": "3.x"
   }
 }

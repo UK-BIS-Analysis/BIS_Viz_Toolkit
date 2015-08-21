@@ -1,2 +1,3 @@
-rect.segment {
+rect.segment:hover {
+  opacity: 0.8;
 }

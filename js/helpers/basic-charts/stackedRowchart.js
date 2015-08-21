@@ -31,6 +31,7 @@ define(['helpers/basic-charts/_base'], function(Base) {
 
     // Configuration variables
     var svg,
+        tip,
         dispatch = d3.dispatch('customHover'); // Dispatcher for the custom events
 
     // Variables that can be set with getters/setters below
@@ -66,6 +67,10 @@ define(['helpers/basic-charts/_base'], function(Base) {
           container.append('g').classed('chart-group', true);
           container.append('g').classed('x-axis-group axis', true);
           container.append('g').classed('y-axis-group axis', true);
+          tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .attr('class', 'd3-tip-stackedRowchart')
+            .html(function(d) { return d.label + ': ' + d.value; });
         }
 
         // Main visualization variables
@@ -173,6 +178,12 @@ define(['helpers/basic-charts/_base'], function(Base) {
         // EXIT: Remove any elements that no longer match data
         bars.exit().transition().style({opacity: 0}).remove();
         segments.exit().transition().style({opacity: 0}).remove();
+
+        // Add tooltip
+        svg.call(tip);
+        segments
+          .on('mouseover', tip.show)
+          .on('mouseout', tip.hide);
       });
     };
 
