@@ -68,8 +68,7 @@ define(['helpers/basic-charts/_base'], function(Base) {
           container.append('g').classed('x-axis-group axis', true);
           container.append('g').classed('y-axis-group axis', true);
           tip = d3.tip()
-            .attr('class', 'd3-tip')
-            .attr('class', 'd3-tip-stackedRowchart')
+            .attr('class', 'd3-tip d3-tip-stackedRowchart')
             .html(function(d) { return d.label + ': ' + d.value; });
         }
 
