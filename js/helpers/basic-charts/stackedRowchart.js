@@ -23,31 +23,41 @@
  * The accessor is supposed to return an array of numbers which will be used to draw the stacked segments.
  */
 
-define(['helpers/basic-charts/_base'], function(Base) {
+define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
   'use strict';
 
   // This is the function that is called when you do something like: var chart1 = Barchart()
   return function module () {
 
-    // Configuration variables
-    var svg,
-        tip,
-        dispatch = d3.dispatch('customHover'); // Dispatcher for the custom events
+    // Internal variables
+    var dispatch = d3.dispatch('select'); // Dispatcher for the custom events
 
-    // Variables that can be set with getters/setters below
-    var accessor = function (d) { return d; };
+    // The chart function is exported and configured in viz.js.
+    // The draw method is called in a D3 chain such as d3.select('#chart').datum(records).call(stackedRowchart);
+    var chart = new BaseChart();
 
-    // The exportable function
-    var exports = function (_selection) {
+    chart.draw = function (_selection) {
+
       _selection.each(function(_data) {
 
-        // Instantiate base chart
-        var _base = Base(this)
-          .addResizeListener(exports, _selection)
-          .addCSS('css/charts/stackedRowchart.css')
-          .addDownloadSVGBahaviour('#chart2-downloadSvg', this)
-          .addDownloadPNGBahaviour('#chart2-downloadPng', this)
-          .addDownloadCSVBahaviour('#chart2-downloadCsv', _data);
+        chart.data = _data;
+
+        // If this is the first run and we don't have the reference to the SVG
+        // node saved then we create it along with a few other setup routines
+        if (!chart.svg) {
+          // Create the SVG
+          chart.svg = chart.addSvg(this);
+          // Add some behaviours
+          chart.addResizeListener(chart.draw, _selection)
+               .addCSS('css/charts/stackedRowchart.css')
+               .setup(this);
+
+          // Create containers for chart and axises
+          var container = chart.svg.append('g').classed('container-group', true).classed('barchart', true);
+          container.append('g').classed('chart-group', true);
+          container.append('g').classed('x-axis-group axis', true);
+          container.append('g').classed('y-axis-group axis', true);
+        }
 
         /*
          *  ██████╗██╗  ██╗ █████╗ ██████╗ ████████╗    ██╗      ██████╗  ██████╗ ██╗ ██████╗
@@ -57,20 +67,6 @@ define(['helpers/basic-charts/_base'], function(Base) {
          * ╚██████╗██║  ██║██║  ██║██║  ██║   ██║       ███████╗╚██████╔╝╚██████╔╝██║╚██████╗
          *  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝ ╚═════╝
          */
-
-        // If this is the first run and we don't have the reference to the SVG
-        // node saved then get it. Note that the svg element is actually created
-        // by the Base class and here we are only saving a D3 object with it.
-        if (!svg) {
-          svg = d3.select(this).select('svg');
-          var container = svg.append('g').classed('container-group', true).classed('barchart', true);
-          container.append('g').classed('chart-group', true);
-          container.append('g').classed('x-axis-group axis', true);
-          container.append('g').classed('y-axis-group axis', true);
-          tip = d3.tip()
-            .attr('class', 'd3-tip d3-tip-stackedRowchart')
-            .html(function(d) { return d.label + ': ' + d.value; });
-        }
 
         // Main visualization variables
         var margin = { top: 20, right: 20, bottom: 40, left: 40 },
@@ -94,7 +90,7 @@ define(['helpers/basic-charts/_base'], function(Base) {
         var xScale = d3.scale.linear()
           .domain([0, d3.max(_data, function(d, i) {
             // Returns the sum of all elements in the array
-            return accessor(d).reduce(function (prev, curr) { return prev + curr.value }, 0);
+            return chart.accessor(d).reduce(function (prev, curr) { return prev + curr.value; }, 0);
           })])
           .range([0, chartW]);
         var yScale = d3.scale.ordinal()
@@ -111,18 +107,19 @@ define(['helpers/basic-charts/_base'], function(Base) {
         var color = d3.scale.category10();
 
         // Transform the main 'svg' and axes into place.
-        svg.transition().attr({width: width, height: height});
-        svg.select('.container-group')
+        chart.svg.transition().attr({width: width, height: height});
+        chart.svg.select('.container-group')
           .attr({transform: 'translate(' + margin.left + ',' + margin.top + ')'});
-        svg.select('.x-axis-group.axis')
+        chart.svg.select('.x-axis-group.axis')
           .transition()
           .ease(ease)
           .attr({transform: 'translate(0,' + (chartH) + ')'})
           .call(xAxis);
-        svg.select('.y-axis-group.axis')
+        chart.svg.select('.y-axis-group.axis')
           .transition()
           .ease(ease)
           .call(yAxis);
+
 
         // Determine bar and gap size.
         var gapSize = yScale.rangeBand() / 100 * gap;
@@ -130,7 +127,7 @@ define(['helpers/basic-charts/_base'], function(Base) {
 
         // Setup the enter, exit and update of the actual bars and segments in the chart.
         // BIND: Select the bars, and bind the data to the .bar elements.
-        var bars = svg.select('.chart-group')
+        var bars = chart.svg.select('.chart-group')
           .selectAll('.bar')
           .data(_data);
         // ENTER: Create elements that are not already in the DOM
@@ -139,11 +136,11 @@ define(['helpers/basic-charts/_base'], function(Base) {
           .classed('bar', true)
           .attr('transform', function (d,i) {
             return 'translate(0,'+yScale(i)+')';
-          })
+          });
         // Segments: rect.segment
         var segments = bars.selectAll('rect')
             .data(function(d) {
-              return accessor(d).map(function (curr, i, arr) {
+              return chart.accessor(d).map(function (curr, i, arr) {
                 curr.base = arr.reduce(function (prev, curr, j, arr) {
                   return j < i ? prev + curr.value : prev;
                 }, 0);
@@ -179,28 +176,23 @@ define(['helpers/basic-charts/_base'], function(Base) {
         segments.exit().transition().style({opacity: 0}).remove();
 
         // Add tooltip
-        svg.call(tip);
+        chart.svg.call(chart.toolTip);
         segments
-          .on('mouseover', tip.show)
-          .on('mouseout', tip.hide);
+          .on('mouseover', chart.toolTip.show)
+          .on('mouseout', chart.toolTip.hide);
       });
+
+      // End of CHART LOGIC (normally no need to edit below here)
+
     };
 
 
 
+    // Rebind custom dispatch events to the 'chart' function, so it's available 'externally' under the typical 'on' method:
+    d3.rebind(chart, dispatch, 'on');
 
-    // Custom getters and setters
-    exports.accessor = function(func) {
-      if (!arguments.length) { return accessor; }
-      accessor = func;
-      return this;
-    };
-
-    // Rebind 'customHover' event to the 'exports' function, so it's available 'externally' under the typical 'on' method:
-    d3.rebind(exports, dispatch, 'on');
-
-    // Return exports function
-    return exports;
+    // Return chart function
+    return chart;
   };
 
 });
