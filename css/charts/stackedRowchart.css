@@ -1,3 +1,18 @@
+text {
+  font-size: 10px;
+}
+
+line,
+path.domain {
+  stroke: #513ace;
+  fill: none;
+  stroke-opacity: .75;
+  shape-rendering: crispEdges;
+}
+
+rect.bar {
+  fill: rgb(73, 125, 188);
+}
 rect.segment:hover {
   opacity: 0.8;
 }

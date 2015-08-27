@@ -122,22 +122,32 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      * ███████║   ██║   ███████╗██║         ██████╔╝
      * ╚══════╝   ╚═╝   ╚══════╝╚═╝         ╚═════╝  : Define charts
      *
-     * Setup any charts.
+     * Setup the charts.
+     * The accessor function should return an array of objects.
+     * Each object should have a label and a value property.
+     * Values should be numerical (integer or float)
      *
      */
 
-    // Initialize and configure the charts
+    // Initialize and configure the chart drawing functions
     var barchart = Barchart()
+      .addDownloadSVGBehaviour('#chart1-downloadSvg')
+      .addDownloadPNGBehaviour('#chart1-downloadPng')
+      .addDownloadCSVBehaviour('#chart1-downloadCsv')
       .accessor(function (d) { return d.A1; });
 
     var stackedRowchart = StackedRowchart()
+      .addDownloadSVGBehaviour('#chart2-downloadSvg')
+      .addDownloadPNGBehaviour('#chart2-downloadPng')
+      .addDownloadCSVBehaviour('#chart2-downloadCsv')
+//      .addXaxisTitle('test')
       .accessor(function (d) {
         return [
-          { label: 'Answer1', value: parseFloat(d.A1) },
-          { label: 'Answer2', value: parseFloat(d.A2) },
-          { label: 'Answer3', value: parseFloat(d.A3) },
-          { label: 'Answer4', value: parseFloat(d.A4) },
-          { label: 'Answer5', value: parseFloat(d.A5) }
+          { label: 'Answer 1', value: parseFloat(d.A1) },
+          { label: 'Answer 2', value: parseFloat(d.A2) },
+          { label: 'Answer 3', value: parseFloat(d.A3) },
+          { label: 'Answer 4', value: parseFloat(d.A4) },
+          { label: 'Answer 5', value: parseFloat(d.A5) }
         ];
       });
 
@@ -153,13 +163,13 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      */
     data.on('dataUpdate', function (records) {
       d3.select('#chart1-barchart')
-        .datum(records).call(barchart);
+        .datum(records).call(barchart.draw);
       d3.select('#chart2-stackedRowchart')
-        .datum(records).call(stackedRowchart);
+        .datum(records).call(stackedRowchart.draw);
     });
 
     secondaryData.on('dataUpdate', function (records) {
-      // Do something with the secondary data
+      // Update charts that depend on the secondary data
     });
 
 
