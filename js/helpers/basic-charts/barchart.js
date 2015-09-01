@@ -92,7 +92,7 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           .domain(_data.map(function(d, i) { return i; }))
           .rangeRoundBands([0, chartW], 0.1);
         var yScale = d3.scale.linear()
-          .domain([0, d3.max(_data, function(d, i) { return chart.accessor(d); })])
+          .domain([0, d3.max(_data, function(d, i) { return chart.yAccessor(d); })])
           .range([chartH, 0]);
         var xAxis = d3.svg.axis()
           .scale(xScale)
@@ -129,8 +129,8 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           .classed('bar', true)
           .attr({x: chartW,
                  width: barW,
-                 y: function(d, i) { return yScale(chart.accessor(d)); },
-                 height: function(d, i) { return chartH - yScale(chart.accessor(d)); }
+                 y: function(d, i) { return yScale(chart.yAccessor(d)); },
+                 height: function(d, i) { return chartH - yScale(chart.yAccessor(d)); }
                 })
           .on('mouseover', dispatch.customHover);
         // UPDATE: Update any elements that are in the DOM but have new data binded to them
@@ -139,8 +139,8 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           .attr({
           width: barW,
           x: function(d, i) { return xScale(i) + gapSize / 2; },
-          y: function(d, i) { return yScale(chart.accessor(d)); },
-          height: function(d, i) { return chartH - yScale(chart.accessor(d)); }
+          y: function(d, i) { return yScale(chart.yAccessor(d)); },
+          height: function(d, i) { return chartH - yScale(chart.yAccessor(d)); }
         });
         // EXIT: Remove any elements that no longer match data
         bars.exit().transition().style({opacity: 0}).remove();

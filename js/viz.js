@@ -1,7 +1,6 @@
 /*jslint browser: true*/
 /*jslint white: true */
 /*jslint vars: true */
-/*jslint nonew: true */
 /*global $, Modernizr, d3, dc, crossfilter, document, console, alert, require, window, DEBUG */
 
 // Add a timestamp to the query to avoid browser caching
@@ -32,7 +31,7 @@ require.config({ urlArgs: "build=" + (new Date()).getTime() });
  *      Please note that modules have capitalized names. Instances below will have lower cases names.
  * Then it is wrapped in the jQuery $(document).ready callback to make sure the DOM has completed loading.
  * */
-require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/barchart', 'helpers/basic-charts/stackedRowchart'], function(gui, Data, Filter, Barchart, StackedRowchart) {
+require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/barchart', 'helpers/basic-charts/rowchart'], function(gui, Data, Filter, Barchart, Rowchart) {
   'use strict';
   $(document).ready(function () {
 
@@ -100,15 +99,15 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      *   .draw('Question', 'Question', '#qFilter')
      *
      */
-    var questionControl = Filter()
+    var questionControl = new Filter()
       .attach(data)
       .add('Question', 'Question', '#qFilter');
 
-    var periodControl = Filter()
+    var periodControl = new Filter()
       .attach(data)
       .add('Period', 'Period', '#periodFilter');
 
-    var gdpControl = Filter()
+    var gdpControl = new Filter()
       .attach(secondaryData)
       .add('quarterName', 'Quarter', '#gdpFilter');
 
@@ -130,24 +129,29 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      */
 
     // Initialize and configure the chart drawing functions
-    var barchart = Barchart()
+    var barchart = new Barchart()
       .addDownloadSVGBehaviour('#chart1-downloadSvg')
       .addDownloadPNGBehaviour('#chart1-downloadPng')
       .addDownloadCSVBehaviour('#chart1-downloadCsv')
-      .accessor(function (d) { return d.A1; });
+      .yAccessor(function (d) { return d.A1; });
 
-    var stackedRowchart = StackedRowchart()
+    var rowchart = new Rowchart()
       .addDownloadSVGBehaviour('#chart2-downloadSvg')
       .addDownloadPNGBehaviour('#chart2-downloadPng')
       .addDownloadCSVBehaviour('#chart2-downloadCsv')
-//      .addXaxisTitle('test')
-      .accessor(function (d) {
+      .addXaxisTitle('Percent (%)')
+      .addYaxisTitle('Period')
+      .xAxisTickFormat(d3.format('%'))
+      .yAccessor(function (d, i) {
+        return d.Period;
+      })
+      .xAccessor(function (d, i) {
         return [
-          { label: 'Answer 1', value: parseFloat(d.A1) },
-          { label: 'Answer 2', value: parseFloat(d.A2) },
-          { label: 'Answer 3', value: parseFloat(d.A3) },
-          { label: 'Answer 4', value: parseFloat(d.A4) },
-          { label: 'Answer 5', value: parseFloat(d.A5) }
+          { label: 'Answer 1', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
+          { label: 'Answer 2', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) },
+          { label: 'Answer 3', value: parseFloat(d.A3), displayValue: d3.format('%')(d.A3) },
+          { label: 'Answer 4', value: parseFloat(d.A4), displayValue: d3.format('%')(d.A4) },
+          { label: 'Answer 5', value: parseFloat(d.A5), displayValue: d3.format('%')(d.A5) }
         ];
       });
 
@@ -165,7 +169,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
       d3.select('#chart1-barchart')
         .datum(records).call(barchart.draw);
       d3.select('#chart2-stackedRowchart')
-        .datum(records).call(stackedRowchart.draw);
+        .datum(records).call(rowchart.draw);
     });
 
     secondaryData.on('dataUpdate', function (records) {

@@ -25,7 +25,8 @@ define([], function() {
 
     // Internal closure vars
     var svg,
-        accessor = accessor = function (d) { return d; },
+        xAccessor = function (d) { return d; },
+        yAccessor = function (d) { return d; },
         setupTasks = [];
 
     // The exportable function, this is the object returned and that has all the methods to work as a base for other charts.
@@ -47,14 +48,24 @@ define([], function() {
       });
     };
 
-    baseChart.accessor = function() {
+    baseChart.xAccessor = function(f) {
       // If passed a function as argument then set accessor
-      if (arguments.length == 1 && typeof arguments[0] === 'function') {
-        accessor = arguments[0];
+      if (arguments.length === 1 && typeof f === 'function') {
+        xAccessor = f;
         return this;
       }
       // Otherwise run the current accessor and return results
-      return accessor.apply(this, arguments);
+      return xAccessor.apply(this, arguments);
+    };
+
+    baseChart.yAccessor = function(f) {
+      // If passed a function as argument then set accessor
+      if (arguments.length === 1 && typeof f === 'function') {
+        yAccessor = f;
+        return this;
+      }
+      // Otherwise run the current accessor and return results
+      return yAccessor.apply(this, arguments);
     };
 
     baseChart.addResizeListener = function (func, sel) {
@@ -83,8 +94,9 @@ define([], function() {
               csvStr = '';
 
           arr.forEach(function (currLine) {
-            var line = '';
-            for (var currCol in currLine) {
+            var line = '',
+                currCol;
+            for (currCol in currLine) {
               if (currLine.hasOwnProperty(currCol)) {
                 if (line !== '') { line += ','; }
                 line += currLine[currCol];
@@ -141,20 +153,38 @@ define([], function() {
     };
 
     baseChart.toolTip = d3.tip()
-            .attr('class', 'd3-tip d3-tip-stackedRowchart')
-            .html(function(d) { return d.label + ': ' + d.value; });
+      .attr('class', 'd3-tip d3-tip-stackedRowchart')
+      .html(function(d) { return d.label + ': ' + d.displayValue; });
 
-    //FIX
     baseChart.addXaxisTitle = function (title) {
-      console.log('Title added!!');
+      this.xAxisTitle = title;
       return this;
     };
 
+    baseChart.addYaxisTitle = function (title) {
+      this.yAxisTitle = title;
+      return this;
+    };
+
+    // TickFormat getter/setter
+    var _xAxisTickFormat = null;
+    baseChart.xAxisTickFormat = function (format) {
+      if (arguments.length === 1) {
+        _xAxisTickFormat = format;
+        return this;
+      }
+      return _xAxisTickFormat;
+    };
+    var _yAxisTickFormat = null;
+    baseChart.yAxisTickFormat = function (format) {
+      if (arguments.length === 1) {
+        _yAxisTickFormat = format;
+        return this;
+      }
+      return _yAxisTickFormat;
+    };
 
     // TODO:
-    // baseChart.addYaxisTitle
-    // baseChart.xTickFormat
-    // baseChart.yTickFormat
     // legends?
 
 
