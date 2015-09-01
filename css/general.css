@@ -29,10 +29,18 @@
   float: right;
 }
 .top-buffer {
-  margin-top: 1em;
+  padding-top: 1em;
 }
 
 
+/*
+ * Color bands for rows
+ */
+.row-band-col-1 { border-left: 17px solid #337AB7; }
+.row-band-col-2 { border-left: 17px solid #449D44; }
+.row-band-col-3 { border-left: 17px solid #31B0D5; }
+.row-band-col-4 { border-left: 17px solid #EC971F; }
+.row-band-col-5 { border-left: 17px solid #C9302C; }
 
 /*
  * Tooltip styles from

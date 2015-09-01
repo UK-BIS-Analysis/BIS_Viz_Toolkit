@@ -135,48 +135,44 @@
          screen sizes, resulting in a responsive layout.
     -->
     <div class="container-fluid" id="mainContainer">
-      <!-- Title and filters row -->
+
+      <!-- Page title -->
       <div class="row">
         <div class="col-md-12">
           <h1 class="page-header text-center">Data Visualization Template</h1>
         </div>
-        <div class="col-md-1">
-          <p>Data filters:</p>
-        </div>
-        <div class="col-md-11" class="filters">
-          <!-- Some filters perhaps... -->
-          <div id="periodFilter"></div>
-          <div id="qFilter"></div>
-          <div class="clearfix"></div>
-          <div id="gdpFilter"></div>
+      </div>
+
+      <!-- Example 1 title and comments -->
+      <div class="row row-band-col-1">
+        <div class="col-md-12">
+          <h2>Example #1: Survey</h2>
+          <p>
+            This example uses a sample dataset with random data reflecting a survey.
+            The survey has multiple choices and was conducted repeatedly over three querters.
+            Each line in the dataset represents the aggregated results from a specific question in a specific quarter.
+          </p>
+          <p><strong>Sample from the dataset:</strong></p>
+          <pre>"Period","Question","A1","A2","A3","A4","A5"
+"2015 Q1","Q01 Question one?",0.05,0.16,0.33,0.08,0.38
+"2015 Q1","Q02 Question two?",0.15,0.66,0.16,0.03,0.00
+"2015 Q1","Q03 Question three?",0.04,0.29,0.11,0.17,0.39</pre>
         </div>
       </div>
-      <!-- First line of the visualization -->
-      <div class="row top-buffer">
-        <div class="col-md-6 col-sm-12">
-          <!-- Panel with first chart: Barchart -->
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <!-- Dropdown menu with download options (remove what you don't want) -->
-              <div class="dropdown chart-options">
-                <button class="btn btn-default dropdown-toggle btn-xs" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  <span class="glyphicon glyphicon-cog"></span>
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-right chart-option-menu" aria-labelledby="dropdownMenu1">
-                  <li><a href="#" id="chart1-downloadSvg">Download chart as SVG</a></li>
-                  <li><a href="#" id="chart1-downloadPng">Download chart as PNG</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#" id="chart1-downloadCsv">Download data in CSV</a></li>
-                </ul>
-              </div>
-              <h3 class="panel-title">Simple bar chart</h3>
-            </div>
-            <div class="panel-body">
-              <div id="chart1-barchart"></div>
-            </div>
-          </div>
+
+      <!-- Example 1 filters -->
+      <div class="row top-buffer row-band-col-1">
+        <div class="col-md-1">
+          <p><strong>Data filters:</strong></p>
         </div>
+        <div class="col-md-11" class="filters">
+          <div id="qFilter"></div>
+        </div>
+      </div>
+
+
+      <!-- Example 1 Charts -->
+      <div class="row top-buffer row-band-col-1">
         <div class="col-md-6 col-sm-12">
           <!-- Panel with second chart: Stacked bar chart -->
           <div class="panel panel-default">
@@ -194,15 +190,65 @@
                   <li><a href="#" id="chart2-downloadCsv">Download data in CSV</a></li>
                 </ul>
               </div>
-              <h3 class="panel-title">Simple stacked row chart</h3>
+              <h3 class="panel-title">Distribution of answers (row chart)</h3>
             </div>
             <div class="panel-body">
+              <p>This is an example of a stacked row chart using the rowchart.js module.</p>
               <div id="chart2-stackedRowchart"></div>
             </div>
           </div>
         </div>
+
+        <div class="col-md-6 col-sm-12">
+          <!-- Panel with first chart: Barchart -->
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <!-- Dropdown menu with download options (remove what you don't want) -->
+              <div class="dropdown chart-options">
+                <button class="btn btn-default dropdown-toggle btn-xs" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span class="glyphicon glyphicon-cog"></span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right chart-option-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="#" id="chart1-downloadSvg">Download chart as SVG</a></li>
+                  <li><a href="#" id="chart1-downloadPng">Download chart as PNG</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" id="chart1-downloadCsv">Download data in CSV</a></li>
+                </ul>
+              </div>
+              <h3 class="panel-title">Distribution of answers (bar chart)</h3>
+            </div>
+            <div class="panel-body">
+              <p>This is the same chart as a bar chart using the barchart.js module.</p>
+              <div id="chart1-barchart"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="row">
+
+
+      <!-- Example 1 Charts second row -->
+      <div class="row top-buffer row-band-col-1">
+        <div class="col-md-2 col-sm-12 col-md-offset-1">
+          col
+        </div>
+        <div class="col-md-2 col-sm-12">
+          col
+        </div>
+        <div class="col-md-2 col-sm-12">
+          col
+        </div>
+        <div class="col-md-2 col-sm-12">
+          col
+        </div>
+        <div class="col-md-2 col-sm-12">
+          col
+        </div>
+      </div>
+
+
+      <!-- Example 1 Table -->
+      <div class="row row-band-col-1">
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-heading">
@@ -213,10 +259,46 @@
             </div>
           </div>
         </div>
+      </div>
+
+
+      <!-- Example 2 title and comments -->
+      <div class="row row-band-col-2">
+        <div class="col-md-12">
+          <h2>Example #2: GDP Data</h2>
+          <p>
+            This example uses a dataset based on GDP economic parameters.
+            It is similar to the previously created visualization <a href="http://play.fm.to.it/gdpviz">here</a>.
+          </p>
+          <p><strong>Sample from the dataset:</strong></p>
+          <pre>Date,quarterName,GDP,GDPGrowth,ABJR,ABJRGrowth,HAYO,HAYOGrowth,NMRY,NMRYGrowth,NPEL,NPELGrowth,DLWF,DLWFGrowth,OtherInvestment,OtherInvestmentGrowth,IKBK,IKBKGrowth,IKBL,IKBLGrowth,NetTrade,Other,OtherGrowth
+01/04/1997,1997 Q2,301318,1.144309168,175569,0.948137075,10056,1.977487070,59667,-1.529854441,30892,2.328662758,5395,8.159582999,17534,-1.874755163,76348,3.323769826,-74367,4.699488941,1981,224,-4.377263158
+01/07/1997,1997 Q3,303490,0.720833140,176533,0.549071875,10230,1.730310263,59928,0.437427724,32906,6.519487246,5488,1.723818350,17166,-2.098779514,77703,1.774768167,-75443,1.446878320,2260,-1021,-22.232142857
+01/10/1997,1997 Q4,307560,1.341065603,177648,0.631609954,10423,1.886608016,61341,2.357829395,33661,2.294414393,5278,-3.826530612,17782,3.588488873,78406,0.904726973,-77082,2.172501094,1324,103,-4.403525955
+01/01/1998,1998 Q1,309517,0.636298608,180603,1.663401783,10109,-3.012568358,61421,0.130418480,33640,-0.062386738,5912,12.012125805,17166,-3.464177258,78925,0.661939137,-79033,2.531070808,-108,774,26.058252427
+01/04/1998,1998 Q2,311857,0.756016632,182758,1.193224919,10435,3.224849144,62226,1.310626659,34690,3.121284185,5560,-5.953991881,17334,0.978678784,80049,1.424136839,-81446,3.053155011,-1397,251,-2.702842377
+01/07/1998,1998 Q3,314098,0.718598588,185488,1.493778658,10597,1.552467657,62355,0.207308842,35074,1.106947247,5881,5.773381295,18123,4.551748010,78334,-2.142437757,-80968,-0.586891928,-2634,-786,-16.525896414
+</pre>
+        </div>
+      </div>
+
+      <!-- Example 2 filters -->
+      <div class="row top-buffer row-band-col-2">
+        <div class="col-md-1">
+          <p><strong>Data filters:</strong></p>
+        </div>
+        <div class="col-md-11" class="filters">
+          <div id="gdpFilter"></div>
+        </div>
+      </div>
+
+
+      <!-- Bootstrap examples -->
+      <div class="row row-band-col-5">
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Text styles</h3>
+              <h3 class="panel-title">Bootstrap sample styles available for re-use</h3>
             </div>
             <div class="panel-body">
               <h1>1.0 First level heading</h1>

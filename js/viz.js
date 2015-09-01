@@ -103,10 +103,6 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
       .attach(data)
       .add('Question', 'Question', '#qFilter');
 
-    var periodControl = new Filter()
-      .attach(data)
-      .add('Period', 'Period', '#periodFilter');
-
     var gdpControl = new Filter()
       .attach(secondaryData)
       .add('quarterName', 'Quarter', '#gdpFilter');
@@ -147,11 +143,11 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
       })
       .xAccessor(function (d, i) {
         return [
-          { label: 'Answer 1', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
-          { label: 'Answer 2', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) },
-          { label: 'Answer 3', value: parseFloat(d.A3), displayValue: d3.format('%')(d.A3) },
-          { label: 'Answer 4', value: parseFloat(d.A4), displayValue: d3.format('%')(d.A4) },
-          { label: 'Answer 5', value: parseFloat(d.A5), displayValue: d3.format('%')(d.A5) }
+          { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
+          { label: 'Agree', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) },
+          { label: 'Neither agree nor disagree', value: parseFloat(d.A3), displayValue: d3.format('%')(d.A3) },
+          { label: 'Disagree', value: parseFloat(d.A4), displayValue: d3.format('%')(d.A4) },
+          { label: 'Strongly disagree', value: parseFloat(d.A5), displayValue: d3.format('%')(d.A5) }
         ];
       });
 
