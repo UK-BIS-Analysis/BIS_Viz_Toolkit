@@ -67,7 +67,7 @@ define([], function() {
 
       // Launch a get request for the data file
       loadCsv.get(function (_err, _response) {
-        if (_err) { throw _err; };
+        if (_err) { throw _err; }
 
         // If a a cleaning function is supplied then apply it.
         if (typeof _cleaningFunc === 'function') {
@@ -79,8 +79,11 @@ define([], function() {
 
         // If there already are any filters set then apply them to crossfilter
         if (Object.keys(currentFilters).length) {
-          for (var key in currentFilters) {
-            exports.filter(key, currentFilters[key]);
+          var key;
+          for (key in currentFilters) {
+            if (currentFilters.hasOwnProperty(key)) {
+              exports.filter(key, currentFilters[key]);
+            }
           }
         } else {
           //Dispatch our custom dataUpdate event passing in the cleaned data.
@@ -128,7 +131,7 @@ define([], function() {
     exports.getDim = function (_dim) {
       // Note: this function returns the dimension and is not chainable
       return dims[_dim];
-    }
+    };
 
 
 
@@ -154,14 +157,14 @@ define([], function() {
         currentFilters[_dim] = filter;
 
         // Dispatch the update
-        //console.table(dims[_dim].top(Infinity));
+        // console.table(dims[_dim].top(Infinity));
         dispatch.dataUpdate(dims[_dim].top(Infinity));
 
         // And update URL
         internal.updateURL();
       }
       return this;
-    }
+    };
 
 
     internal.decodeURL = function () {
@@ -176,7 +179,7 @@ define([], function() {
       } catch (err) {
         return {};
       }
-    },
+    };
 
 
 
@@ -186,16 +189,19 @@ define([], function() {
           query = '?';
       $.extend(urlFilters, currentFilters);
       delete urlFilters._suid;
-      for (var key in urlFilters) {
-        query += encodeURIComponent(key);
-        if (urlFilters[key]) {
-          query += '=' + encodeURIComponent(urlFilters[key]);
+      var key;
+      for (key in urlFilters) {
+        if (urlFilters.hasOwnProperty(key)) {
+          query += encodeURIComponent(key);
+          if (urlFilters[key]) {
+            query += '=' + encodeURIComponent(urlFilters[key]);
+          }
+          query += '&';
         }
-        query += '&';
       }
       query = query.slice(0, -1);
       history.replaceState(null,$('title').text(),query);
-    },
+    };
 
 
     // Bind the 'on' event of the dispatch object to the exportable data module itself.
@@ -203,5 +209,5 @@ define([], function() {
 
     // Return object
     return exports;
-  }
+  };
 });
