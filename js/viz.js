@@ -125,12 +125,6 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      */
 
     // Initialize and configure the chart drawing functions
-    var barchart = new Barchart()
-      .addDownloadSVGBehaviour('#chart1-downloadSvg')
-      .addDownloadPNGBehaviour('#chart1-downloadPng')
-      .addDownloadCSVBehaviour('#chart1-downloadCsv')
-      .yAccessor(function (d) { return d.A1; });
-
     var rowchart = new Rowchart()
       .addDownloadSVGBehaviour('#chart2-downloadSvg')
       .addDownloadPNGBehaviour('#chart2-downloadPng')
@@ -142,6 +136,26 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
         return d.Period;
       })
       .xAccessor(function (d, i) {
+        return [
+          { label: 'Strongly disagree', value: parseFloat(d.A5), displayValue: d3.format('%')(d.A5) },
+          { label: 'Disagree', value: parseFloat(d.A4), displayValue: d3.format('%')(d.A4) },
+          { label: 'Neither agree nor disagree', value: parseFloat(d.A3), displayValue: d3.format('%')(d.A3) },
+          { label: 'Agree', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) },
+          { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) }
+        ];
+      });
+
+    var barchart = new Barchart()
+      .addDownloadSVGBehaviour('#chart1-downloadSvg')
+      .addDownloadPNGBehaviour('#chart1-downloadPng')
+      .addDownloadCSVBehaviour('#chart1-downloadCsv')
+      .addXaxisTitle('Period')
+      .addYaxisTitle('Percent (%)')
+      .yAxisTickFormat(d3.format('%'))
+      .xAccessor(function (d, i) {
+        return d.Period;
+      })
+      .yAccessor(function (d, i) {
         return [
           { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
           { label: 'Agree', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) },

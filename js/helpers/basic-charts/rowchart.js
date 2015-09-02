@@ -9,19 +9,43 @@
 
 
 /*
- *                         _                _        _
+ *                        _                _        _
  *  _ _  ___ __ __ __ __ | |_   __ _  _ _ | |_     (_) ___
  * | '_|/ _ \\ V  V // _|| ' \ / _` || '_||  _| _  | |(_-<
  * |_|  \___/ \_/\_/ \__||_||_|\__,_||_|   \__|(_)_/ |/__/
  *                                               |__/
  * This provides a rowchart which can also be stacked.
  *
- * TODO: make examples for stacked and un-stacked
- * The accessor is supposed to return an array of numbers which will be used to draw the stacked segments.
- * Example usage:
- *   var chart1 = Barchart()
- *     .accessor(function (d) { return { Answer1: d.A1} });
+ * The xAccessor is supposed to return an array of numbers which will be used to draw the stacked segments.
+ * The yAccessor determines the labels on the yAxis.
  *
+ * Simple row chart example:
+ *
+ *   var chart1 = Rowchart()
+ *     .yAccessor(function (d, i) {
+ *       return d.Period;
+ *     })
+ *     .xAccessor(function (d, i) {
+ *       return [
+ *         { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) }
+ *       ];
+ *     });
+ *
+ * Stacked row chart example:
+ *
+ *   var chart1 = Rowchart()
+ *     .yAccessor(function (d, i) {
+ *       return d.Period;
+ *     })
+ *     .xAccessor(function (d, i) {
+ *       return [
+ *         { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
+ *         { label: 'Agree', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) },
+ *         { label: 'Neither agree nor disagree', value: parseFloat(d.A3), displayValue: d3.format('%')(d.A3) },
+ *         { label: 'Disagree', value: parseFloat(d.A4), displayValue: d3.format('%')(d.A4) },
+ *         { label: 'Strongly disagree', value: parseFloat(d.A5), displayValue: d3.format('%')(d.A5) }
+ *       ];
+ *     });
  */
 
 define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
@@ -45,7 +69,8 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
       _selection.each(function(_data) {
 
         // We save the data object into our chart object so that it's available
-        chart.data = _data;
+        // We also reverse the order to make the chart readable top to bottom instead of bottom to top
+        chart.data = _data.reverse();
 
         // If this is the first run then we don't have the reference to the SVG node saved.
         // We therefore create it along with a few other setup routines
@@ -54,7 +79,7 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           chart.svg = chart.addSvg(this);
           // Add some behaviours (using methods from the baseChart)
           chart.addResizeListener(chart.draw, _selection)
-               .addCSS('css/charts/stackedRowchart.css')
+               .addCSS('css/charts/rowchart.css')
                .setup(this);
 
           // Create containers for chart and axises
@@ -114,7 +139,7 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           })])
           .range([0, chartW]);
         var yScale = d3.scale.ordinal()
-          .domain(_data.map(function(d, i) { return chart.yAccessor(d,i); }))
+          .domain(_data.map(chart.yAccessor))
           .rangeRoundBands([chartH, 0], 0.1);
         var xAxis = d3.svg.axis()
           .scale(xScale)
@@ -126,7 +151,11 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           .orient('left');
 
         // Color scale
-        var color = d3.scale.category10();
+        // Use http://colorbrewer2.org/ for other color palettes
+        var colors = ['rgb(215,25,28)','rgb(253,174,97)','rgb(255,255,191)','rgb(166,217,106)','rgb(26,150,65)'];
+        var color = d3.scale.ordinal()
+          .domain(d3.range(0,_data.length-1))
+          .range(colors);
 
         // Transform the main <svg> and axes into place.
         chart.svg.transition().attr({width: width, height: height});
@@ -150,7 +179,6 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           .transition()
           .ease(ease)
           .attr('y', -margin.left/2);
-
 
         // Determine bar and gap size.
         var gapSize = yScale.rangeBand() / 100 * gap;
