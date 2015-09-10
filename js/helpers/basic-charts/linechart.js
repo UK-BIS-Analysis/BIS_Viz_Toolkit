@@ -26,7 +26,7 @@
 define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
   'use strict';
 
-  // This is the function that is called when you do something like: var chart1 = Rowchart()
+  // This is the function that is called when you do something like: var chart1 = Barchart()
   return function module () {
 
     // Internal variables
@@ -53,11 +53,11 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           chart.svg = chart.addSvg(this);
           // Add some behaviours (using methods from the baseChart)
           chart.addResizeListener(chart.draw, _selection)
-               .addCSS('css/charts/stackedRowchart.css')
+               .addCSS('css/charts/barchart.css')
                .setup(this);
 
           // Create containers for chart and axises
-          var container = chart.svg.append('g').classed('container-group', true).classed('rowchart', true);
+          var container = chart.svg.append('g').classed('container-group', true).classed('barchart', true);
           container.append('g').classed('chart-group', true);
           var xAxisGroup = container.append('g').classed('x-axis-group axis', true);
           var yAxisGroup = container.append('g').classed('y-axis-group axis', true);
@@ -103,18 +103,18 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
         // Internal sizing of the chart and bars
         var chartW = width - margin.left - margin.right,
             chartH = height - margin.top - margin.bottom,
-            barH = chartH / _data.length;
+            barW = chartW / _data.length;
 
         // X and Y scales and axis
-        var xScale = d3.scale.linear()
+        var xScale = d3.scale.ordinal()
+          .domain(_data.map(chart.xAccessor))
+          .rangeRoundBands([0, chartW], 0.1);
+        var yScale = d3.scale.linear()
           .domain([0, d3.max(_data, function(d, i) {
             // Returns the sum of all elements in the array
-            return chart.xAccessor(d).reduce(function (prev, curr) { return prev + curr.value; }, 0);
+            return chart.yAccessor(d).reduce(function (prev, curr) { return prev + curr.value; }, 0);
           })])
-          .range([0, chartW]);
-        var yScale = d3.scale.ordinal()
-          .domain(_data.map(function(d, i) { return chart.yAccessor(d,i); }))
-          .rangeRoundBands([chartH, 0], 0.1);
+          .range([chartH, 0]);
         var xAxis = d3.svg.axis()
           .scale(xScale)
           .tickFormat(chart.xAxisTickFormat())
@@ -125,7 +125,11 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           .orient('left');
 
         // Color scale
-        var color = d3.scale.category10();
+        // Use http://colorbrewer2.org/ for other color palettes
+        var colors = ['rgb(215,25,28)','rgb(253,174,97)','rgb(255,255,191)','rgb(166,217,106)','rgb(26,150,65)'];
+        var color = d3.scale.ordinal()
+          .domain(d3.range(0,_data.length-1))
+          .range(colors.reverse());
 
         // Transform the main <svg> and axes into place.
         chart.svg.transition().attr({width: width, height: height});
@@ -150,12 +154,11 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
           .ease(ease)
           .attr('y', -margin.left/2);
 
-
         // Determine bar and gap size.
-        var gapSize = yScale.rangeBand() / 100 * gap;
-        barH = yScale.rangeBand() - gapSize;
+        var gapSize = xScale.rangeBand() / 100 * gap;
+        barW = xScale.rangeBand() - gapSize;
 
-        // Setup the enter, exit and update of the actual bars and segments in the chart.
+        // Setup the enter, exit and update of the actual bars in the chart.
         // BIND: Select the bars, and bind the data to the .bar elements.
         var bars = chart.svg.select('.chart-group')
           .selectAll('.bar')
@@ -165,40 +168,44 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
         bars.enter().append('g')
           .classed('bar', true)
           .attr('transform', function (d,i) {
-            return 'translate(0,'+yScale(chart.yAccessor(d))+')';
+            return 'translate('+xScale(chart.xAccessor(d))+',0)';
           });
         // Segments: rect.segment
         var segments = bars.selectAll('rect')
             .data(function(d) {
-              return chart.xAccessor(d).map(function (curr, i, arr) {
+              // Each bar is bound to an array of object for the stack.
+              // Here we bind each segment of the array to an individual data point from the array.
+              return chart.yAccessor(d).map(function (curr, i, arr) {
                 curr.base = arr.reduce(function (prev, curr, j, arr) {
-                  return j < i ? prev + curr.value : prev;
+                  return j >= i ? prev + curr.value : prev;
                 }, 0);
+                curr.yScale0 = yScale(0);
+                curr.yScaleBase = yScale(curr.base);
                 return curr;
               });
             });
         segments.enter().append('rect')
           .classed('segment', true)
           .attr({
-            x: function(d, i) { return xScale(d.base); },
-            height: barH,
+            y: function(d, i) { return yScale(d.base); },
+            width: barW,
             fill: function(d, i) { return color(i); },
-            width: function(d, i) { return xScale(d.value); }
+            height: function(d, i) { return yScale(0)-yScale(d.value); }
           });
 
         // UPDATE: Update any elements that are in the DOM but have new data binded to them
         bars.transition()
           .ease(ease)
           .attr('transform', function (d,i) {
-            return 'translate(0,'+yScale(chart.yAccessor(d))+')';
+            return 'translate('+xScale(chart.xAccessor(d))+',0)';
           });
         segments.transition()
           .ease(ease)
           .attr({
-            x: function(d, i) { return xScale(d.base); },
-            height: barH,
+            y: function(d, i) { return yScale(d.base); },
+            width: barW,
             fill: function(d, i) { return color(i); },
-            width: function(d, i) { return xScale(d.value); }
+            height: function(d, i) { return yScale(0)-yScale(d.value); }
           });
 
         // EXIT: Remove any elements that no longer match data
@@ -223,10 +230,10 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
 
     };
 
-    // Rebind custom dispatch events to the 'chart' function, so it's available 'externally' under the typical 'on' method:
+    // Rebind 'customHover' event to the 'exports' function, so it's available 'externally' under the typical 'on' method:
     d3.rebind(chart, dispatch, 'on');
 
-    // Return chart function
+    // Return exports function
     return chart;
   };
 

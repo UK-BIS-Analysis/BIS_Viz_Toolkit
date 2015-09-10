@@ -199,17 +199,21 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
         // Segments: rect.segment
         var segments = bars.selectAll('rect')
             .data(function(d) {
+              // Each bar is bound to an array of object for the stack.
+              // Here we bind each segment of the array to an individual data point from the array.
               return chart.yAccessor(d).map(function (curr, i, arr) {
                 curr.base = arr.reduce(function (prev, curr, j, arr) {
-                  return j < i ? prev + curr.value : prev;
+                  return j >= i ? prev + curr.value : prev;
                 }, 0);
+                curr.yScale0 = yScale(0);
+                curr.yScaleBase = yScale(curr.base);
                 return curr;
               });
             });
         segments.enter().append('rect')
           .classed('segment', true)
           .attr({
-            y: function(d, i) { return yScale(0)-yScale(d.base); },
+            y: function(d, i) { return yScale(d.base); },
             width: barW,
             fill: function(d, i) { return color(i); },
             height: function(d, i) { return yScale(0)-yScale(d.value); }
@@ -224,7 +228,7 @@ define(['helpers/basic-charts/_baseChart'], function(BaseChart) {
         segments.transition()
           .ease(ease)
           .attr({
-            y: function(d, i) { return yScale(0)-yScale(d.base); },
+            y: function(d, i) { return yScale(d.base); },
             width: barW,
             fill: function(d, i) { return color(i); },
             height: function(d, i) { return yScale(0)-yScale(d.value); }

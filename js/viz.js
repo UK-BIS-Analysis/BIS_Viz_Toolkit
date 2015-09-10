@@ -31,7 +31,7 @@ require.config({ urlArgs: "build=" + (new Date()).getTime() });
  *      Please note that modules have capitalized names. Instances below will have lower cases names.
  * Then it is wrapped in the jQuery $(document).ready callback to make sure the DOM has completed loading.
  * */
-require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/barchart', 'helpers/basic-charts/rowchart'], function(gui, Data, Filter, Barchart, Rowchart) {
+require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/barchart', 'helpers/basic-charts/rowchart', 'helpers/basic-charts/linechart'], function(gui, Data, Filter, Barchart, Rowchart, Linechart) {
   'use strict';
   $(document).ready(function () {
 
@@ -73,7 +73,6 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
     var data = new Data()
       .load('data/samples/questions.csv', 'csv')
       .setDim('Question')
-      .setDim('Period')
       .filter('Question', 'Q01 Question one?', true);
 
     var secondaryData = new Data()
@@ -125,7 +124,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      */
 
     // Initialize and configure the chart drawing functions
-    var rowchart = new Rowchart()
+    var chart1 = new Rowchart()
       .addDownloadSVGBehaviour('#chart2-downloadSvg')
       .addDownloadPNGBehaviour('#chart2-downloadPng')
       .addDownloadCSVBehaviour('#chart2-downloadCsv')
@@ -145,16 +144,14 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
         ];
       });
 
-    var barchart = new Barchart()
+    var chart2 = new Barchart()
       .addDownloadSVGBehaviour('#chart1-downloadSvg')
       .addDownloadPNGBehaviour('#chart1-downloadPng')
       .addDownloadCSVBehaviour('#chart1-downloadCsv')
       .addXaxisTitle('Period')
       .addYaxisTitle('Percent (%)')
       .yAxisTickFormat(d3.format('%'))
-      .xAccessor(function (d, i) {
-        return d.Period;
-      })
+      .xAccessor(function (d, i) { return d.Period; })
       .yAccessor(function (d, i) {
         return [
           { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
@@ -162,6 +159,21 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
           { label: 'Neither agree nor disagree', value: parseFloat(d.A3), displayValue: d3.format('%')(d.A3) },
           { label: 'Disagree', value: parseFloat(d.A4), displayValue: d3.format('%')(d.A4) },
           { label: 'Strongly disagree', value: parseFloat(d.A5), displayValue: d3.format('%')(d.A5) }
+        ];
+      });
+
+    var chart3 = new Linechart()
+      .addDownloadSVGBehaviour('#chart3-downloadSvg')
+      .addDownloadPNGBehaviour('#chart3-downloadPng')
+      .addDownloadCSVBehaviour('#chart3-downloadCsv')
+      .addXaxisTitle('Period')
+      .addYaxisTitle('Percent (%)')
+      .yAxisTickFormat(d3.format('%'))
+      .xAccessor(function (d, i) { return d.Period; })
+      .yAccessor(function (d, i) {
+        return [
+          { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
+          { label: 'Agree', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) }
         ];
       });
 
@@ -176,10 +188,12 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      *
      */
     data.on('dataUpdate', function (records) {
-      d3.select('#chart1-barchart')
-        .datum(records).call(barchart.draw);
-      d3.select('#chart2-stackedRowchart')
-        .datum(records).call(rowchart.draw);
+      d3.select('#chart1')
+        .datum(records).call(chart1.draw);
+      d3.select('#chart2')
+        .datum(records).call(chart2.draw);
+      d3.select('#chart3')
+        .datum(records).call(chart3.draw);
     });
 
     secondaryData.on('dataUpdate', function (records) {
