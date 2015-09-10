@@ -60,6 +60,7 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      *   More than 8 dimensions are not recommended.
      *   Ensure that dimension names are unique even if you use different data sources.
      *   It's best to use column names that do not use spaces or special charachters.
+     * - You must set at least one dimension (TODO confirm if this is the case)
      * You can load multiple data sources by creating different variables (e.g. data1, data2...)
      *
      * Example:
@@ -70,15 +71,13 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      *    .setDim('Question');
      *
      */
-    var data = new Data()
+    var questionsData = new Data()
       .load('data/samples/questions.csv', 'csv')
       .setDim('Question')
       .filter('Question', 'Q01 Question one?', true);
 
-    var secondaryData = new Data()
-      .load('data/samples/gdp.csv', 'csv')
-      .setDim('quarterName')
-      .filter('quarterName', '1997 Q2', true);
+    var gdpData = new Data()
+      .load('data/samples/gdp.csv', 'csv');
 
 
 
@@ -94,17 +93,14 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      *
      * Example:
      * var controls = Controls()
-     *   .attach(data)
+     *   .attach(questionsData)
      *   .draw('Question', 'Question', '#qFilter')
      *
      */
     var questionControl = new Filter()
-      .attach(data)
+      .attach(questionsData)
       .add('Question', 'Question', '#qFilter');
 
-    var gdpControl = new Filter()
-      .attach(secondaryData)
-      .add('quarterName', 'Quarter', '#gdpFilter');
 
 
 
@@ -166,16 +162,10 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
       .addDownloadSVGBehaviour('#chart3-downloadSvg')
       .addDownloadPNGBehaviour('#chart3-downloadPng')
       .addDownloadCSVBehaviour('#chart3-downloadCsv')
-      .addXaxisTitle('Period')
-      .addYaxisTitle('Percent (%)')
-      .yAxisTickFormat(d3.format('%'))
-      .xAccessor(function (d, i) { return d.Period; })
-      .yAccessor(function (d, i) {
-        return [
-          { label: 'Strongly agree', value: parseFloat(d.A1), displayValue: d3.format('%')(d.A1) },
-          { label: 'Agree', value: parseFloat(d.A2), displayValue: d3.format('%')(d.A2) }
-        ];
-      });
+      .addXaxisTitle('Quarter')
+      .addYaxisTitle('GDP (in Millions)')
+      .xAccessor(function (d, i) { return d.quarterName; })
+      .yAccessor(function (d, i) { return +d.GDP; });
 
 
     /*
@@ -187,17 +177,16 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      * ╚══════╝   ╚═╝   ╚══════╝╚═╝              ╚═╝ : Bind drawing functions to updates in the data
      *
      */
-    data.on('dataUpdate', function (records) {
+    questionsData.on('dataUpdate', function (records) {
       d3.select('#chart1')
         .datum(records).call(chart1.draw);
       d3.select('#chart2')
         .datum(records).call(chart2.draw);
-      d3.select('#chart3')
-        .datum(records).call(chart3.draw);
     });
 
-    secondaryData.on('dataUpdate', function (records) {
-      // Update charts that depend on the secondary data
+    gdpData.on('dataUpdate', function (records) {
+      d3.select('#chart3')
+        .datum(records).call(chart3.draw);
     });
 
 
