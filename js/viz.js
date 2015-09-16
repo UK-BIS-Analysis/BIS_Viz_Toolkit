@@ -69,6 +69,9 @@ require(['helpers/gui', 'helpers/data', 'helpers/filter', 'helpers/basic-charts/
      *    .load('data/samples/questions.csv', 'csv')
      *    // Usage .setDim(dimensionName)
      *    .setDim('Question');
+     *    // Usage: .filter(DimensionName, ValueToFilterBy, isDefault)
+     *    // Generally in this position you're setting the default preselected value so the last parameter should ne true
+     *    .filter('Question', 'Q01 Question one?', true);
      *
      */
     var questionsData = new Data()
